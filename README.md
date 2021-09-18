@@ -21,6 +21,7 @@ Notes:
   "deauthorize" the app in Discord.
 - The Discord user is bound to a Neucore player account. The nickname is set to the name of the main character.
 - If the main character is changed, the nickname is updated.
+- The bot cannot change the nickname of the server owner.
 - If the main character is removed from the account, the nickname is changed to the name of the new main.
 - If all characters were removed from the Neucore player account, the member is kicked from the Discord server.
 - If a member was added in another way to the Discord server, and they are already associated with a Neucore service
