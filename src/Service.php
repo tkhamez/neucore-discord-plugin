@@ -111,6 +111,16 @@ class Service implements ServiceInterface
      */
     private $lastRequestErrorBody = '';
 
+    /**
+     * @var ResponseInterface
+     */
+    private $lastRequestResult;
+
+    /**
+     * @var array<string, array>
+     */
+    private $rateLimits = [];
+
     public function __construct(LoggerInterface $logger, ServiceConfiguration $serviceConfiguration)
     {
         $this->logger = $logger;
@@ -288,7 +298,7 @@ class Service implements ServiceInterface
         }
 
         // Get member data from Discord (roles, nick, username, discriminator)
-        $member = $this->sendRequest(
+        $member = $this->apiRequest(
             'GET',
             "https://discord.com/api/guilds/$this->serverId/members/$discordUserId",
             $this->authHeader
@@ -373,7 +383,7 @@ class Service implements ServiceInterface
         }
         $roleSuccess = true;
         foreach ($rolesToRemove as $roleToRemove) {
-            $resultRemove = $this->sendRequest(
+            $resultRemove = $this->apiRequest(
                 'DELETE',
                 "https://discord.com/api/guilds/$this->serverId/members/$discordUserId/roles/$roleToRemove",
                 $this->authHeader
@@ -385,7 +395,7 @@ class Service implements ServiceInterface
             }
         }
         foreach ($rolesToAdd as $roleToAdd) {
-            $resultAdd = $this->sendRequest(
+            $resultAdd = $this->apiRequest(
                 'PUT',
                 "https://discord.com/api/guilds/$this->serverId/members/$discordUserId/roles/$roleToAdd",
                 $this->authHeader
@@ -427,7 +437,7 @@ class Service implements ServiceInterface
         $limit = 500;
         $after = 0;
         while (true) {
-            $membersResult = $this->sendRequest(
+            $membersResult = $this->apiRequest(
                 'GET',
                 "https://discord.com/api/guilds/$this->serverId/members?limit=$limit&after=$after",
                 $this->authHeader
@@ -657,7 +667,7 @@ class Service implements ServiceInterface
         }
 
         // Add to server.
-        $body3 = $this->sendRequest(
+        $body3 = $this->apiRequest(
             'PUT',
             "https://discord.com/api/guilds/$this->serverId/members/$userId",
             $this->authHeader + ['Content-Type' => 'application/json'],
@@ -769,7 +779,7 @@ class Service implements ServiceInterface
         if ($currentNickname === $newNickname) {
              return true;
         }
-        $result = $this->sendRequest(
+        $result = $this->apiRequest(
             'PATCH',
             "https://discord.com/api/guilds/$this->serverId/members/$userId",
             $this->authHeader + ['Content-Type' => 'application/json'],
@@ -784,11 +794,41 @@ class Service implements ServiceInterface
      */
     private function kickMember(string $discordUserId): ?string
     {
-        return $this->sendRequest(
+        return $this->apiRequest(
             'DELETE',
             "https://discord.com/api/guilds/$this->serverId/members/$discordUserId",
             $this->authHeader
         );
+    }
+
+    private function apiRequest(string $method, string $url, array $headers = [], ?string $body = null): ?string
+    {
+        // https://discord.com/developers/docs/topics/rate-limits
+
+        // Simple rate limit implementation, sleep if any bucket is too low
+        foreach ($this->rateLimits as /*$bucket =>*/ $limit) {
+            $resetAfter = $limit['time'] + $limit['resetAfter'] - time();
+            if ($limit['remaining'] < 2) {
+                $this->log("Rate limit: remaining < 2, sleeping $resetAfter seconds");
+                sleep($resetAfter);
+            }
+        }
+
+        $result = $this->sendRequest($method, $url, $headers, $body);
+
+        // Store rate limit info, do not use X-RateLimit-Reset in case the local time is wrong.
+        $rateLimitRemaining = $this->lastRequestResult->getHeader('X-RateLimit-Remaining')[0] ?? '';
+        $rateLimitResetAfter = $this->lastRequestResult->getHeader('X-RateLimit-Reset-After')[0] ?? '';
+        $rateLimitBucket = $this->lastRequestResult->getHeader('X-RateLimit-Bucket')[0] ?? '';
+        if (!empty($rateLimitRemaining) && !empty($rateLimitResetAfter) && !empty($rateLimitBucket)) {
+            $this->rateLimits[$rateLimitBucket] = [
+                'remaining' => $rateLimitRemaining,
+                'resetAfter' => $rateLimitResetAfter,
+                'time' => time(),
+            ];
+        }
+
+        return $result;
     }
 
     private function sendRequest(string $method, string $url, array $headers = [], ?string $body = null): ?string
@@ -800,20 +840,20 @@ class Service implements ServiceInterface
 
         $request = new Request($method, $url, $headers, $body);
         try {
-            $result = $this->getHttpClient()->sendRequest($request);
+            $this->lastRequestResult = $this->getHttpClient()->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
             $this->logException($e, __FUNCTION__);
             return null;
         }
 
         try {
-            $body = $result->getBody()->getContents();
+            $body = $this->lastRequestResult->getBody()->getContents();
         } catch (RuntimeException $e) {
             $this->logException($e, __FUNCTION__);
             return null;
         }
 
-        $code = $result->getStatusCode();
+        $code = $this->lastRequestResult->getStatusCode();
         if ($code < 200 || $code > 299) {
             $this->logError(
                 "Request: $method $url " . json_encode($headers) . ', ' .
@@ -824,7 +864,7 @@ class Service implements ServiceInterface
             return null;
         }
 
-        #$this->log('OK: ' . $result->getStatusCode(), LogLevel::DEBUG);
+        #$this->log('OK: ' . $this->lastRequestResult->getStatusCode(), LogLevel::DEBUG);
 
         return $body;
     }
