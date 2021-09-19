@@ -807,8 +807,8 @@ class Service implements ServiceInterface
 
         // Simple rate limit implementation, sleep if any bucket is too low
         foreach ($this->rateLimits as /*$bucket =>*/ $limit) {
-            $resetAfter = $limit['time'] + $limit['resetAfter'] - time();
-            if ($limit['remaining'] < 2) {
+            $resetAfter = max(0, $limit['time'] + $limit['resetAfter'] - time());
+            if ($limit['remaining'] < 2 && $resetAfter > 0) {
                 $this->log("Rate limit: remaining < 2, sleeping $resetAfter seconds");
                 sleep($resetAfter);
             }
