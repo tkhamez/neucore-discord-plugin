@@ -74,7 +74,7 @@ Notes:
   Status Nonmember: Click "Request Invitation" to be added to the server. To do this,  you will need to log 
   into your Discord account, allow access to your username, and allow the app to join servers for you. After 
   you have been successfully invited, you can deauthorize this app in your user settings if you wish.    
-  Status Active: Click the "Refresh Account" button to sync your Core groups with Discord roles. This also 
+  Status Active: Click the "Update Account" button to sync your Core groups with Discord roles. This also 
   happens automatically several times a day.
 - Add the following in the "Configuration Data" text area (YAML format), replace with your values:
   ```yaml
