@@ -31,6 +31,12 @@ class Service implements ServiceInterface
 
     private const USERNAME_NA = 'n/a';
 
+    private const RATE_LIMIT_REMAIN = 'X-RateLimit-Remaining';
+
+    private const RATE_LIMIT_RESET_AFTER = 'X-RateLimit-Reset-After';
+
+    private const RATE_LIMIT_BUCKET = 'X-RateLimit-Bucket';
+
     /**
      * @var LoggerInterface
      */
@@ -806,26 +812,39 @@ class Service implements ServiceInterface
         // https://discord.com/developers/docs/topics/rate-limits
 
         // Simple rate limit implementation, sleep if any bucket is too low
+        $resetAfter = 0;
+        $remaining = PHP_INT_MAX;
         foreach ($this->rateLimits as /*$bucket =>*/ $limit) {
-            $resetAfter = max(0, $limit['time'] + $limit['resetAfter'] - time());
-            if ($limit['remaining'] < 2 && $resetAfter > 0) {
-                $this->log("Rate limit: remaining < 2, sleeping $resetAfter seconds");
-                sleep($resetAfter);
-            }
+            $resetAfter = ceil(max($resetAfter, $limit['time'] + ($limit['resetAfter'] + 0.01) - microtime(true)));
+            $remaining = min($remaining, $limit['remaining']);
+        }
+        if ($remaining < 1 && $resetAfter > 0) {
+            $this->log("Rate limit: remaining < 1, sleeping $resetAfter second(s)");
+            sleep($resetAfter);
         }
 
         $result = $this->sendRequest($method, $url, $headers, $body);
 
         // Store rate limit info, do not use X-RateLimit-Reset in case the local time is wrong.
-        $rateLimitRemaining = $this->lastRequestResult->getHeader('X-RateLimit-Remaining')[0] ?? '';
-        $rateLimitResetAfter = $this->lastRequestResult->getHeader('X-RateLimit-Reset-After')[0] ?? '';
-        $rateLimitBucket = $this->lastRequestResult->getHeader('X-RateLimit-Bucket')[0] ?? '';
+        $rateLimitRemaining = $this->lastRequestResult->getHeader(self::RATE_LIMIT_REMAIN)[0] ?? '';
+        $rateLimitResetAfter = $this->lastRequestResult->getHeader(self::RATE_LIMIT_RESET_AFTER)[0] ?? '';
+        $rateLimitBucket = $this->lastRequestResult->getHeader(self::RATE_LIMIT_BUCKET)[0] ?? '';
         if (!empty($rateLimitRemaining) && !empty($rateLimitResetAfter) && !empty($rateLimitBucket)) {
             $this->rateLimits[$rateLimitBucket] = [
-                'remaining' => $rateLimitRemaining,
-                'resetAfter' => $rateLimitResetAfter,
-                'time' => time(),
+                'remaining' => (int)$rateLimitRemaining,
+                'resetAfter' => (float)$rateLimitResetAfter,
+                'time' => microtime(true),
             ];
+        }
+        if ($this->lastRequestErrorCode === 429) {
+            $parsedBody = json_decode($this->lastRequestErrorBody, true);
+            if (isset($parsedBody['retry_after'])) {
+                $this->rateLimits['http429'] = [
+                    'remaining' => 0,
+                    'resetAfter' => (float)$parsedBody['retry_after'],
+                    'time' => microtime(true),
+                ];
+            }
         }
 
         return $result;
@@ -855,16 +874,20 @@ class Service implements ServiceInterface
 
         $code = $this->lastRequestResult->getStatusCode();
         if ($code < 200 || $code > 299) {
+            $requestHeaders = $headers;
+            if (isset($requestHeaders['Authorization'])) {
+                $authValues = explode(' ', $requestHeaders['Authorization']); // value is e.g. "Bot abc123"
+                $requestHeaders['Authorization'] = $authValues[0] . ' ****';
+            }
+            $responseHeaders = $this->getDebugHeaders($this->lastRequestResult->getHeaders());
             $this->logError(
-                "Request: $method $url " . json_encode($headers) . ', ' .
-                "Response: $code $body"
+                "Request: $method $url " . json_encode($requestHeaders) . ', ' .
+                "Response: $code $body " . json_encode($responseHeaders)
             );
             $this->lastRequestErrorCode = $code;
             $this->lastRequestErrorBody = $body;
             return null;
         }
-
-        #$this->log('OK: ' . $this->lastRequestResult->getStatusCode(), LogLevel::DEBUG);
 
         return $body;
     }
@@ -901,6 +924,26 @@ class Service implements ServiceInterface
             ]);
         }
         return $this->httpClient;
+    }
+
+    private function getDebugHeaders(array $headers): array
+    {
+        $result = [];
+        $keep = [
+            strtolower('Retry-After'),
+            strtolower('X-RateLimit-Global'),
+            strtolower('X-RateLimit-Limit'),
+            strtolower(self::RATE_LIMIT_REMAIN),
+            strtolower('X-RateLimit-Reset'),
+            strtolower(self::RATE_LIMIT_RESET_AFTER),
+            strtolower(self::RATE_LIMIT_BUCKET),
+        ];
+        foreach ($headers as $name => $header) {
+            if (in_array(strtolower($name), $keep)) {
+                $result[$name] = $header[0] ?? '';
+            }
+        }
+        return $result;
     }
 
     /** @noinspection PhpSameParameterValueInspection */
