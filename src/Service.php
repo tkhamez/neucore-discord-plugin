@@ -21,6 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
+use stdClass;
 use Symfony\Component\Yaml\Yaml;
 use Throwable;
 use function json_decode;
@@ -126,6 +127,13 @@ class Service implements ServiceInterface
      * @var array<string, array>
      */
     private $rateLimits = [];
+
+    /**
+     * Cache of discord members to reduce API request.
+     *
+     * @var array<string, stdClass>
+     */
+    private $discordMembers = [];
 
     public function __construct(LoggerInterface $logger, ServiceConfiguration $serviceConfiguration)
     {
@@ -304,12 +312,16 @@ class Service implements ServiceInterface
         }
 
         // Get member data from Discord (roles, nick, username, discriminator)
-        $member = $this->apiRequest(
-            'GET',
-            "https://discord.com/api/guilds/$this->serverId/members/$discordUserId",
-            $this->authHeader
-        );
-        $memberObject = json_decode((string) $member);
+        if (isset($this->discordMembers[$discordUserId])) {
+            $memberObject = $this->discordMembers[$discordUserId];
+        } else {
+            $member = $this->apiRequest(
+                'GET',
+                "https://discord.com/api/guilds/$this->serverId/members/$discordUserId",
+                $this->authHeader
+            );
+            $memberObject = json_decode((string) $member);
+        }
         if (!is_object($memberObject)) {
             $lastErrorBody = json_decode($this->lastRequestErrorBody);
             if (
@@ -439,9 +451,10 @@ class Service implements ServiceInterface
     public function getAllPlayerAccounts(): array
     {
         // Get all current server members
-        $discordUserIds = [];
+        $discordUserIds = []; /* @var string[] $discordUserIds */
         $limit = 500;
         $after = 0;
+        $this->discordMembers = [];
         while (true) {
             $membersResult = $this->apiRequest(
                 'GET',
@@ -455,6 +468,7 @@ class Service implements ServiceInterface
             foreach ($members as $member) {
                 if (!isset($member->user->bot) || !$member->user->bot) {
                     $discordUserIds[] = $member->user->id;
+                    $this->discordMembers[$member->user->id] = $member; // cache for later use in updatePlayerAccount()
                 }
                 $after = max($after, $member->user->id);
             }
@@ -738,8 +752,8 @@ class Service implements ServiceInterface
     }
 
     /**
-     * @param int|null $playerId Must be provided if $discordId is null.
-     * @param array|null $discordIds Must be provided if $playerId is null, will be ignored if $playerId is not null.
+     * @param int|null $playerId Must be provided if $discordIds is null.
+     * @param string[]|null $discordIds Must be provided if $playerId is null, will be ignored if $playerId is not null.
      * @param string $status
      * @throws Exception
      */
