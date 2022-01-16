@@ -109,3 +109,4 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 2022-01-16
 
 - Roles are now assigned directly after a user was added to the server.
+- Raised minimum required PHP version to 7.4.

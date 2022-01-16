@@ -38,102 +38,60 @@ class Service implements ServiceInterface
 
     private const RATE_LIMIT_BUCKET = 'X-RateLimit-Bucket';
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var ServiceConfiguration
-     */
-    private $configuration;
+    private ServiceConfiguration $configuration;
 
-    /**
-     * @var string
-     */
-    private $sessionStateKey;
+    private string $sessionStateKey;
 
-    /**
-     * @var string
-     */
-    private $tableName = '';
+    private string $tableName = '';
 
-    /**
-     * @var string
-     */
-    private $serverId = '';
+    private string $serverId = '';
 
     /**
      * @var array<string, string>
      */
-    private $authHeader = [];
+    private array $authHeader = [];
 
-    /**
-     * @var string
-     */
-    private $oAuthRedirectUri = '';
+    private string $oAuthRedirectUri = '';
 
-    /**
-     * @var string
-     */
-    private $oAuthClientId = '';
+    private string $oAuthClientId = '';
 
-    /**
-     * @var string
-     */
-    private $oAuthClientSecret = '';
+    private string $oAuthClientSecret = '';
 
     /**
      * @var array<string, int[]>
      */
-    private $roleConfig = [];
+    private array $roleConfig = [];
 
     /**
-     * @var array<string>
+     * @var string[]
      */
-    private $doNotKick = [];
+    private array $doNotKick = [];
 
-    /**
-     * @var bool
-     */
-    private $disableKicks = false;
+    private bool $disableKicks = false;
 
-    /**
-     * @var PDO|null
-     */
-    private $pdo;
+    private ?PDO $pdo = null;
 
-    /**
-     * @var ClientInterface|null
-     */
-    private $httpClient;
+    private ?ClientInterface $httpClient = null;
 
-    /**
-     * @var int
-     */
-    private $lastRequestErrorCode = 0;
+    private int $lastRequestErrorCode = 0;
 
-    /**
-     * @var string
-     */
-    private $lastRequestErrorBody = '';
+    private string $lastRequestErrorBody = '';
 
-    /**
-     * @var ResponseInterface
-     */
-    private $lastRequestResult;
+    private ?ResponseInterface $lastRequestResult = null;
 
     /**
      * @var array<string, array>
      */
-    private $rateLimits = [];
+    private array $rateLimits = [];
 
     /**
      * Cache of discord members to reduce API request.
      *
      * @var array<string, stdClass>
      */
-    private $discordMembers = [];
+    private array $discordMembers = [];
 
     public function __construct(LoggerInterface $logger, ServiceConfiguration $serviceConfiguration)
     {
