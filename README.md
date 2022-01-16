@@ -103,3 +103,9 @@ Run tests:
 ```shell
 vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 ```
+
+## Changelog:
+
+2022-01-16
+
+- Roles are now assigned directly after a user was added to the server.

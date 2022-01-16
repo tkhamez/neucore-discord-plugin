@@ -181,8 +181,6 @@ class Service implements ServiceInterface
     }
 
     /**
-     * @param CoreCharacter[] $characters
-     * @return ServiceAccountData[]
      * @throws Exception
      */
     public function getAccounts(array $characters): array
@@ -228,9 +226,6 @@ class Service implements ServiceInterface
     }
 
     /**
-     * @param CoreCharacter $character This is the main character from the player account.
-     * @param CoreGroup[] $groups
-     * @param int[] $allCharacterIds
      * @throws Exception
      */
     public function register(
@@ -260,7 +255,6 @@ class Service implements ServiceInterface
      * https://discord.com/developers/docs/resources/guild#add-guild-member-role - MANAGE_ROLES
      * https://discord.com/developers/docs/resources/guild#remove-guild-member-role - MANAGE_ROLES
      *
-     * @param CoreGroup[] $groups
      * @throws Exception
      */
     public function updatePlayerAccount(CoreCharacter $mainCharacter, array $groups): void
@@ -539,12 +533,15 @@ class Service implements ServiceInterface
         CoreCharacter $coreCharacter,
         string $name,
         ServerRequestInterface $request,
-        ResponseInterface $response
+        ResponseInterface $response,
+        array $groups
     ): ResponseInterface {
         if ($name === 'login') {
             return $this->requestLogin($response);
         } elseif ($name === 'callback') {
-            return $this->requestCallback($coreCharacter, $request, $response);
+            $response = $this->requestCallback($coreCharacter, $request, $response);
+            $this->updatePlayerAccount($coreCharacter, $groups);
+            return $response;
         }
         $response->getBody()->write('404 Not Found.');
         return $response->withStatus(404);
@@ -960,7 +957,6 @@ class Service implements ServiceInterface
         return $result;
     }
 
-    /** @noinspection PhpSameParameterValueInspection */
     private function logException(Throwable $e, string $function): void
     {
         $this->logError($e->getMessage() . " in $function() at " . __FILE__);
