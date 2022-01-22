@@ -71,7 +71,7 @@ class HttpClient
         $rateLimitRemaining = $this->lastResponse->getHeader(self::RATE_LIMIT_REMAIN)[0] ?? '';
         $rateLimitResetAfter = $this->lastResponse->getHeader(self::RATE_LIMIT_RESET_AFTER)[0] ?? '';
         $rateLimitBucket = $this->lastResponse->getHeader(self::RATE_LIMIT_BUCKET)[0] ?? '';
-        if (!empty($rateLimitRemaining) && !empty($rateLimitResetAfter) && !empty($rateLimitBucket)) {
+        if ($rateLimitRemaining !== '' && !empty($rateLimitResetAfter) && !empty($rateLimitBucket)) {
             $this->rateLimits[$rateLimitBucket] = [
                 'remaining' => (int)$rateLimitRemaining,
                 'resetAfter' => (float)$rateLimitResetAfter,
