@@ -57,7 +57,7 @@ class HttpClient
         $resetAfter = 0;
         $remaining = PHP_INT_MAX;
         foreach ($this->rateLimits as /*$bucket =>*/ $limit) {
-            $resetAfter = ceil(max($resetAfter, $limit['time'] + ($limit['resetAfter'] + 0.01) - microtime(true)));
+            $resetAfter = (int)ceil(max($resetAfter, $limit['time'] + ($limit['resetAfter'] + 0.01) - microtime(true)));
             $remaining = min($remaining, $limit['remaining']);
         }
         if ($remaining < 1 && $resetAfter > 0) {
@@ -83,7 +83,10 @@ class HttpClient
             if (isset($parsedBody['retry_after'])) {
                 $this->rateLimits['http429'] = [
                     'remaining' => 0,
-                    'resetAfter' => (float)$parsedBody['retry_after'],
+
+                    // seems to be milliseconds, not seconds as the documentation states.
+                    'resetAfter' => round($parsedBody['retry_after'] / 1000, 1),
+
                     'time' => microtime(true),
                 ];
             }
