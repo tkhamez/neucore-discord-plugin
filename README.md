@@ -31,8 +31,8 @@ Notes:
 - If a member was added in another way to the Discord server, and they are already associated with a Neucore service
   account, that account status is changed to active and then updated normally (which could mean that the member is 
   kicked again). If there is no associated Neucore service account, the user is also kicked.
-- Members added to a channel are granted the "View Channel" permission for that channel, other permissions 
-  must be granted by roles or manually.
+- Members added to a channel are granted the "View Channel" permission for that channel and additionally "Connect"
+  for voice channels, other permissions must be granted by roles or manually.
 - The bot only manages roles and channels for members who have signed up via Neucore. Members added in other ways 
   are not changed, but can be kicked depending on the configuration.
 

@@ -47,7 +47,7 @@ class Service implements ServiceInterface
      *
      * @var array<string, stdClass>
      */
-    private array $channelPermissions = [];
+    private array $channels = [];
 
     public function __construct(LoggerInterface $logger, ServiceConfiguration $serviceConfiguration)
     {
@@ -321,10 +321,10 @@ class Service implements ServiceInterface
         foreach ($this->config->channelConfig as $channelId => $groupIds) {
 
             // Fetch channels
-            if (!isset($this->channelPermissions[$channelId])) {
+            if (!isset($this->channels[$channelId])) {
                 $channel = $this->discordServer->getChannel((string)$channelId);
                 if ($channel) {
-                    $this->channelPermissions[$channelId] = $channel->permission_overwrites;
+                    $this->channels[$channelId] = $channel;
                 } else {
                     // error is already logged by the HTTP client
                     continue;
@@ -335,22 +335,24 @@ class Service implements ServiceInterface
             $shouldBeMember = !empty(array_intersect($groupIds, $accountGroupIds));
             $isMember = false;
             $updateChannel = false;
-            foreach ($this->channelPermissions[$channelId] as $key => $permission) {
+            foreach ($this->channels[$channelId]->permission_overwrites as $key => $permission) {
                 if ($permission->type === 'member' && $permission->id === $discordUserId) {
                     $isMember = true;
                     if (!$shouldBeMember) {
-                        unset($this->channelPermissions[$channelId][$key]);
+                        unset($this->channels[$channelId]->permission_overwrites[$key]);
                         $updateChannel = true;
                     }
                     break;
                 }
             }
             if ($shouldBeMember && !$isMember) {
+                // "View Channel" + "Connect" for voice channels, otherwise only "View Channel"
+                $permissionBit = (int) $this->channels[$channelId]->type === 2 ? 1049600 : 1024;
                 // https://discord.com/developers/docs/resources/channel#overwrite-object
-                $this->channelPermissions[$channelId][] = (object)[
+                $this->channels[$channelId]->permission_overwrites[] = (object)[
                     'id' => $discordUserId,
                     'type' => 'member', // 1 per documentation, but the API returns "member"
-                    'allow' => 1024, // only "View Channel"
+                    'allow' => $permissionBit,
                     'deny' => 0,
                 ];
                 $updateChannel = true;
@@ -360,7 +362,7 @@ class Service implements ServiceInterface
             if ($updateChannel) {
                 $success = $this->discordServer->updateChannelPermission(
                     (string) $channelId,
-                    array_values($this->channelPermissions[$channelId])
+                    array_values($this->channels[$channelId]->permission_overwrites)
                 );
                 if ($success) {
                     if ($shouldBeMember) {
