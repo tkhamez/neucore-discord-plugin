@@ -11,7 +11,7 @@ Features in detail:
 - Configurable Discord roles that are added or removed based on Neucore groups. Any role that is not in this
   configuration is never added or removed from any member.
 - Configurable channels to which members can be added and removed directly without using a role, based on 
-  Neucore groups.
+  Neucore groups. This only works for less than 100 members!
 - The bot changes the nickname of members to `EVE Character Name [Corporation Ticker]` by default. If a pattern is 
   specified for the "Nickname" configuration, it must contain `{characterName}`. Other available placeholders are 
   `{corporationTicker}` and `{allianceTicker}`. The maximum length for nicknames is 32 characters.
