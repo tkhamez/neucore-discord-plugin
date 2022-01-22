@@ -57,7 +57,8 @@ Notes:
 - On your server go to Settings -> Roles and drag the role of the bot above the roles it will be managing. Also, 
   drag the bot role over any role that has a member you want the bot to set the nickname for.
 - If you are using the bot to manage channel membership, add the bot or its role to the channels from the "Channel" 
-  configuration and give it the "View Channel" permission for each of those channels.
+  configuration and grant it the "View Channel" permission for each of those channels. For voice channels, also 
+  grant the "Manage permissions" and "Connect" permissions.
 
 ## Install
 
