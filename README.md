@@ -12,8 +12,10 @@ Features in detail:
   configuration is never added or removed from any member.
 - Configurable channels to which members can be added and removed directly without using a role, based on 
   Neucore groups.
-- The bot changes the nickname of members to `Eve Character Name [Corporation Ticker]`, it also updates the
-  Discord username and number that is shown in Neucore.
+- The bot changes the nickname of members to `EVE Character Name [Corporation Ticker]` by default. If a pattern is 
+  specified for the "Nickname" configuration, it must contain `{characterName}`. Other available placeholders are 
+  `{corporationTicker}` and `{allianceTicker}`. The maximum length for nicknames is 32 characters.
+- The plugin also updates the Discord username and number that is shown in Neucore.
 - Any server member that does not have an account on Neucore will be kicked, except for the server owner and bots.
 - Configurable list of Discord users that will never be kicked, even if they do not have a Neucore account.
 - Option to disable the function that kicks members.
@@ -97,6 +99,7 @@ Notes:
     - 1 # Neucore group ID
   Channels:
     654: [9] # Discord channel ID: Neucore group ID
+  Nickname: '{characterName} [{corporationTicker}]'
   DoNotKick: # These members will never be kicked
   - 543 # Discord user ID
   DisableKicks: false
@@ -118,6 +121,7 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 2022-01-22
 
 - Added channel membership management.
+- Added Nickname configuration option.
 
 2022-01-16
 

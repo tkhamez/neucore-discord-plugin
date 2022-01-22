@@ -140,17 +140,25 @@ class DiscordServer
     {
         $this->lastRequestError = null;
 
-        $newNickname = "$character->name [$character->corporationTicker]";
+        $pattern = $this->config->nickname;
+        if (strpos($pattern, '{characterName}') === false) {
+            $pattern = '{characterName} [{corporationTicker}]';
+        }
+        $newNickname = mb_substr(str_replace(
+            ['{characterName}', '{corporationTicker}', '{allianceTicker}'],
+            [$character->name, $character->corporationTicker, $character->allianceTicker],
+            $pattern
+        ), 0, 32);
         if ($currentNickname === $newNickname) {
             return true;
         }
+
         $result = $this->httpClient->apiRequest(
             'PATCH',
             "$this->baseUrl/guilds/{$this->config->serverId}/members/$userId",
             $this->config->authHeader + ['Content-Type' => 'application/json'],
             json_encode(['nick' => $newNickname])
         );
-
         return $result !== null;
     }
 

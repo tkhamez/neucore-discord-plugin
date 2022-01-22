@@ -40,6 +40,8 @@ class Config
 
     public bool $disableKicks = false;
 
+    public string $nickname = '';
+
     private Logger $logger;
 
     public function __construct(Logger $logger, string $configurationData)
@@ -85,5 +87,6 @@ class Config
         }
         $this->doNotKick = array_map('intval', $config['DoNotKick'] ?? []);
         $this->disableKicks = (bool) ($config['DisableKicks'] ?? false);
+        $this->nickname = (string) ($config['Nickname'] ?? '');
     }
 }
