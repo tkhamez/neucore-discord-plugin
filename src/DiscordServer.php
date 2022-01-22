@@ -19,6 +19,8 @@ class DiscordServer
 
     private ?int $lastRequestError = null;
 
+    private string $baseUrl = 'https://discord.com/api';
+
     public function __construct(Logger $logger, Config $config)
     {
         $this->config = $config;
@@ -39,7 +41,7 @@ class DiscordServer
 
         return $this->httpClient->apiRequest(
             'DELETE',
-            "https://discord.com/api/guilds/{$this->config->serverId}/members/$discordUserId",
+            "$this->baseUrl/guilds/{$this->config->serverId}/members/$discordUserId",
             $this->config->authHeader
         );
     }
@@ -53,7 +55,7 @@ class DiscordServer
 
         $member = $this->httpClient->apiRequest(
             'GET',
-            "https://discord.com/api/guilds/{$this->config->serverId}/members/$discordUserId",
+            "$this->baseUrl/guilds/{$this->config->serverId}/members/$discordUserId",
             $this->config->authHeader
         );
         $memberObject = json_decode((string) $member);
@@ -76,13 +78,13 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#remove-guild-member-role - MANAGE_ROLES
      */
-    public function removeRole(string $discordUserId, string $roleToRemove): ? string
+    public function removeRole(string $discordUserId, string $roleToRemove): ?string
     {
         $this->lastRequestError = null;
 
         return $this->httpClient->apiRequest(
             'DELETE',
-            "https://discord.com/api/guilds/{$this->config->serverId}/members/$discordUserId/roles/$roleToRemove",
+            "$this->baseUrl/guilds/{$this->config->serverId}/members/$discordUserId/roles/$roleToRemove",
             $this->config->authHeader
         );
     }
@@ -96,9 +98,39 @@ class DiscordServer
 
         return $this->httpClient->apiRequest(
             'PUT',
-            "https://discord.com/api/guilds/{$this->config->serverId}/members/$discordUserId/roles/$roleToAdd",
+            "$this->baseUrl/guilds/{$this->config->serverId}/members/$discordUserId/roles/$roleToAdd",
             $this->config->authHeader
         );
+    }
+
+    /**
+     * https://discord.com/developers/docs/resources/channel#get-channel - MANAGE_CHANNELS + channel member
+     */
+    public function getChannel(string $channelId): ?stdClass
+    {
+        $result = $this->httpClient->apiRequest(
+            'GET',
+            "$this->baseUrl/channels/$channelId",
+            $this->config->authHeader
+        );
+        $object = json_decode((string)$result);
+        return is_object($object) ? $object : null;
+    }
+
+    /**
+     * https://discord.com/developers/docs/resources/channel#modify-channel - MANAGE_CHANNELS + channel member
+     *
+     * @param array<stdClass> $permissions
+     */
+    public function updateChannelPermission(string $channelId, array $permissions): bool
+    {
+        $result = $this->httpClient->apiRequest(
+            'PATCH',
+            "$this->baseUrl/channels/$channelId",
+            $this->config->authHeader + ['Content-Type' => 'application/json'],
+            json_encode(['permission_overwrites' => $permissions])
+        );
+        return $result !== null;
     }
 
     /**
@@ -114,7 +146,7 @@ class DiscordServer
         }
         $result = $this->httpClient->apiRequest(
             'PATCH',
-            "https://discord.com/api/guilds/{$this->config->serverId}/members/$userId",
+            "$this->baseUrl/guilds/{$this->config->serverId}/members/$userId",
             $this->config->authHeader + ['Content-Type' => 'application/json'],
             json_encode(['nick' => $newNickname])
         );
@@ -137,7 +169,7 @@ class DiscordServer
         while (true) {
             $membersResult = $this->httpClient->apiRequest(
                 'GET',
-                "https://discord.com/api/guilds/{$this->config->serverId}/members?limit=$limit&after=$after",
+                "$this->baseUrl/guilds/{$this->config->serverId}/members?limit=$limit&after=$after",
                 $this->config->authHeader
             );
             $members = json_decode((string) $membersResult);
@@ -163,7 +195,7 @@ class DiscordServer
 
         $body = $this->httpClient->sendRequest(
             'POST',
-            'https://discord.com/api/oauth2/token',
+            "$this->baseUrl/oauth2/token",
             ['Content-Type' => 'application/x-www-form-urlencoded'],
             http_build_query([
                 'client_id' => $this->config->oAuthClientId,
@@ -181,7 +213,7 @@ class DiscordServer
     {
         $body = $this->httpClient->sendRequest(
             'GET',
-            "https://discord.com/api/oauth2/@me",
+            "$this->baseUrl/oauth2/@me",
             ['Authorization' => "Bearer $accessToken"]
         );
         $info = json_decode((string)$body, true);
@@ -209,7 +241,7 @@ class DiscordServer
 
         $body = $this->httpClient->apiRequest(
             'PUT',
-            "https://discord.com/api/guilds/{$this->config->serverId}/members/$userId",
+            "$this->baseUrl/guilds/{$this->config->serverId}/members/$userId",
             $this->config->authHeader + ['Content-Type' => 'application/json'],
             json_encode(['access_token' => $accessToken])
         );

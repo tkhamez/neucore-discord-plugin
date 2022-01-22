@@ -94,7 +94,8 @@ class HttpClient
 
     public function sendRequest(string $method, string $url, array $headers = [], ?string $body = null): ?string
     {
-        #$this->log([$method, $url, $headers, $body], LogLevel::DEBUG);
+        #$this->logger->log([$method, $url, $headers, $body], \Psr\Log\LogLevel::DEBUG);
+        #$this->logger->log("$method, $url", \Psr\Log\LogLevel::DEBUG);
 
         $this->lastResponseErrorCode = 0;
         $this->lastResponseErrorBody = '';

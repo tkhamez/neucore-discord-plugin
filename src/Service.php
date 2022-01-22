@@ -40,6 +40,15 @@ class Service implements ServiceInterface
      */
     private array $discordMembers = [];
 
+    /**
+     * Cache of discord channel permissions to reduce API request.
+     *
+     * This property is updated when the channel is modified.
+     *
+     * @var array<string, stdClass>
+     */
+    private array $channelPermissions = [];
+
     public function __construct(LoggerInterface $logger, ServiceConfiguration $serviceConfiguration)
     {
         $this->logger = new Logger($logger, $serviceConfiguration->id);
@@ -186,6 +195,12 @@ class Service implements ServiceInterface
             throw new Exception('Failed add/remove role(s).');
         }
 
+        // Manage channel memberships
+        $channelSuccess = $this->assignChannels($accountGroupIds, $discordUserId);
+        if (!$channelSuccess) {
+            throw new Exception('Failed add/remove channels(s).');
+        }
+
         // Update Discord nickname
         if (!$this->discordServer->setNickname($discordUserId, $mainCharacter, $memberObject->nick)) {
             throw new Exception('Failed to change nickname.');
@@ -298,6 +313,68 @@ class Service implements ServiceInterface
             }
         }
         return $roleSuccess;
+    }
+
+    private function assignChannels(array $accountGroupIds, string $discordUserId): bool
+    {
+        $overallSuccess = true;
+        foreach ($this->config->channelConfig as $channelId => $groupIds) {
+
+            // Fetch channels
+            if (!isset($this->channelPermissions[$channelId])) {
+                $channel = $this->discordServer->getChannel((string)$channelId);
+                if ($channel) {
+                    $this->channelPermissions[$channelId] = $channel->permission_overwrites;
+                } else {
+                    // error is already logged by the HTTP client
+                    continue;
+                }
+            }
+
+            // Add/remove?
+            $shouldBeMember = !empty(array_intersect($groupIds, $accountGroupIds));
+            $isMember = false;
+            $updateChannel = false;
+            foreach ($this->channelPermissions[$channelId] as $key => $permission) {
+                if ($permission->type === 'member' && $permission->id === $discordUserId) {
+                    $isMember = true;
+                    if (!$shouldBeMember) {
+                        unset($this->channelPermissions[$channelId][$key]);
+                        $updateChannel = true;
+                    }
+                    break;
+                }
+            }
+            if ($shouldBeMember && !$isMember) {
+                // https://discord.com/developers/docs/resources/channel#overwrite-object
+                $this->channelPermissions[$channelId][] = (object)[
+                    'id' => $discordUserId,
+                    'type' => 'member', // 1 per documentation, but the API returns "member"
+                    'allow' => 1024, // only "View Channel"
+                    'deny' => 0,
+                ];
+                $updateChannel = true;
+            }
+
+            // Update channel
+            if ($updateChannel) {
+                $success = $this->discordServer->updateChannelPermission(
+                    (string) $channelId,
+                    array_values($this->channelPermissions[$channelId])
+                );
+                if ($success) {
+                    if ($shouldBeMember) {
+                        $this->logger->log("Added $discordUserId to channel $channelId.");
+                    } else {
+                        $this->logger->log("Removed $discordUserId from channel $channelId.");
+                    }
+                } else {
+                    $overallSuccess = false;
+                }
+            }
+        }
+
+        return $overallSuccess;
     }
 
     private function requestLogin(ResponseInterface $response): ResponseInterface

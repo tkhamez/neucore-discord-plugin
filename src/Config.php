@@ -29,6 +29,11 @@ class Config
     public array $roleConfig = [];
 
     /**
+     * @var array<string, int[]>
+     */
+    public array $channelConfig = [];
+
+    /**
      * @var string[]
      */
     public array $doNotKick = [];
@@ -72,9 +77,11 @@ class Config
         }
 
         // optional
-        $roles = $config['Roles'] ?? [];
-        foreach ($roles as $roleId => $groupIds) {
-            $this->roleConfig[(string)$roleId] = array_map('intval', $groupIds);
+        foreach ($config['Roles'] ?? [] as $roleId => $roleGroupIds) {
+            $this->roleConfig[(string)$roleId] = array_map('intval', $roleGroupIds);
+        }
+        foreach ($config['Channels'] ?? [] as $channelId => $channelGroupIds) {
+            $this->channelConfig[(string)$channelId] = array_map('intval', $channelGroupIds);
         }
         $this->doNotKick = array_map('intval', $config['DoNotKick'] ?? []);
         $this->disableKicks = (bool) ($config['DisableKicks'] ?? false);
