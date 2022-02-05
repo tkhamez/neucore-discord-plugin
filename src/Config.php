@@ -10,7 +10,7 @@ class Config
 {
     public string $tableName = '';
 
-    public string $serverId = '';
+    public int $serverId = 0;
 
     /**
      * @var array<string, string>
@@ -24,17 +24,17 @@ class Config
     public string $oAuthClientSecret = '';
 
     /**
-     * @var array<string, int[]>
+     * @var array<int, int[]>
      */
     public array $roleConfig = [];
 
     /**
-     * @var array<string, int[]>
+     * @var array<int, int[]>
      */
     public array $channelConfig = [];
 
     /**
-     * @var string[]
+     * @var int[]
      */
     public array $doNotKick = [];
 
@@ -56,16 +56,16 @@ class Config
         $config = Yaml::parse($configurationData);
 
         // required
-        $this->tableName = (string) preg_replace(
+        $this->tableName = (string)preg_replace(
             '/[^a-zA-Z0-9_]/', '',
             $config['TableName'] ?? '__missing_table_name__'
         );
-        $this->serverId = (string) ($config['ServerId'] ?? '');
-        $botToken = (string) ($config['BotToken'] ?? '');
+        $this->serverId = (int)($config['ServerId'] ?? 0);
+        $botToken = (string)($config['BotToken'] ?? '');
         $this->authHeader = ['Authorization' => "Bot $botToken"];
-        $this->oAuthRedirectUri = (string) ($config['OAuthRedirectUri'] ?? '');
-        $this->oAuthClientId = (string) ($config['OAuthClientId'] ?? '');
-        $this->oAuthClientSecret = (string) ($config['OAuthClientSecret'] ?? '');
+        $this->oAuthRedirectUri = (string)($config['OAuthRedirectUri'] ?? '');
+        $this->oAuthClientId = (string)($config['OAuthClientId'] ?? '');
+        $this->oAuthClientSecret = (string)($config['OAuthClientSecret'] ?? '');
 
         if (
             empty($this->tableName) ||
@@ -80,13 +80,13 @@ class Config
 
         // optional
         foreach ($config['Roles'] ?? [] as $roleId => $roleGroupIds) {
-            $this->roleConfig[(string)$roleId] = array_map('intval', $roleGroupIds);
+            $this->roleConfig[(int)$roleId] = array_map('intval', $roleGroupIds);
         }
         foreach ($config['Channels'] ?? [] as $channelId => $channelGroupIds) {
-            $this->channelConfig[(string)$channelId] = array_map('intval', $channelGroupIds);
+            $this->channelConfig[(int)$channelId] = array_map('intval', $channelGroupIds);
         }
         $this->doNotKick = array_map('intval', $config['DoNotKick'] ?? []);
         $this->disableKicks = (bool) ($config['DisableKicks'] ?? false);
-        $this->nickname = (string) ($config['Nickname'] ?? '');
+        $this->nickname = (string)($config['Nickname'] ?? '');
     }
 }

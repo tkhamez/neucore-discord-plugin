@@ -35,7 +35,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#remove-guild-member - KICK_MEMBERS
      */
-    public function kickMember(string $discordUserId): ?string
+    public function kickMember(int $discordUserId): ?string
     {
         $this->lastRequestError = null;
 
@@ -49,7 +49,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#get-guild-member - no permission
      */
-    public function getMemberData(string $discordUserId): ?stdClass
+    public function getMemberData(int $discordUserId): ?stdClass
     {
         $this->lastRequestError = null;
 
@@ -58,7 +58,7 @@ class DiscordServer
             "$this->baseUrl/guilds/{$this->config->serverId}/members/$discordUserId",
             $this->config->authHeader
         );
-        $memberObject = json_decode((string) $member);
+        $memberObject = json_decode((string)$member);
 
         if (!is_object($memberObject)) {
             $lastErrorBody = json_decode($this->httpClient->getLastResponseErrorBody());
@@ -78,7 +78,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#remove-guild-member-role - MANAGE_ROLES
      */
-    public function removeRole(string $discordUserId, string $roleToRemove): ?string
+    public function removeRole(int $discordUserId, int $roleToRemove): ?string
     {
         $this->lastRequestError = null;
 
@@ -92,7 +92,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#add-guild-member-role - MANAGE_ROLES
      */
-    public function addRole(string $discordUserId, string $roleToAdd): ?string
+    public function addRole(int $discordUserId, int $roleToAdd): ?string
     {
         $this->lastRequestError = null;
 
@@ -106,7 +106,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/channel#get-channel - MANAGE_CHANNELS + channel member
      */
-    public function getChannel(string $channelId): ?stdClass
+    public function getChannel(int $channelId): ?stdClass
     {
         $result = $this->httpClient->apiRequest(
             'GET',
@@ -122,7 +122,7 @@ class DiscordServer
      *
      * @param array<stdClass> $permissions
      */
-    public function updateChannelPermission(string $channelId, array $permissions): bool
+    public function updateChannelPermission(int $channelId, array $permissions): bool
     {
         $result = $this->httpClient->apiRequest(
             'PATCH',
@@ -136,7 +136,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#modify-guild-member - MANAGE_NICKNAMES
      */
-    public function setNickname(string $userId, CoreCharacter $character, string $currentNickname = null): bool
+    public function setNickname(int $userId, CoreCharacter $character, string $currentNickname = null): bool
     {
         $this->lastRequestError = null;
 
@@ -165,7 +165,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#list-guild-members - Server Members Intent
      *
-     * @return array<string, stdClass>
+     * @return array<int, stdClass>
      */
     public function getMembers(): array
     {
@@ -180,15 +180,15 @@ class DiscordServer
                 "$this->baseUrl/guilds/{$this->config->serverId}/members?limit=$limit&after=$after",
                 $this->config->authHeader
             );
-            $members = json_decode((string) $membersResult);
+            $members = json_decode((string)$membersResult);
             if (!is_array($members)) { // request error
                 break;
             }
             foreach ($members as $member) {
                 if (!isset($member->user->bot) || !$member->user->bot) {
-                    $discordMembers[$member->user->id] = $member; // cache for later use in updatePlayerAccount()
+                    $discordMembers[(int)$member->user->id] = $member; // cache for later use in updatePlayerAccount()
                 }
-                $after = max($after, $member->user->id);
+                $after = max($after, (int)$member->user->id);
             }
             if (count($members) < $limit) { // no more results
                 break;
@@ -243,7 +243,7 @@ class DiscordServer
      * https://discord.com/developers/docs/resources/guild#add-guild-member -
      *     CREATE_INSTANT_INVITE + user token with "guilds.join" scope
      */
-    public function addMember(string $userId, string $accessToken): bool
+    public function addMember(int $userId, string $accessToken): bool
     {
         $this->lastRequestError = null;
 

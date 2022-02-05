@@ -36,7 +36,7 @@ class Service implements ServiceInterface
     /**
      * Cache of discord members to reduce API request.
      *
-     * @var array<string, stdClass>
+     * @var array<int, stdClass>
      */
     private array $discordMembers = [];
 
@@ -45,7 +45,7 @@ class Service implements ServiceInterface
      *
      * This property is updated when the channel is modified.
      *
-     * @var array<string, stdClass>
+     * @var array<int, stdClass>
      */
     private array $channels = [];
 
@@ -120,8 +120,8 @@ class Service implements ServiceInterface
 
         // Get member data of player from service account
         $resultAccount = $this->coreAccount->getMemberData($mainCharacter->playerId);
-        $characterId = (int) $resultAccount['characterId'];
-        $discordUserId = (string) $resultAccount['discordId'];
+        $characterId = (int)$resultAccount['characterId'];
+        $discordUserId = (int)$resultAccount['discordId'];
         if (empty($discordUserId)) {
             return;
         }
@@ -164,7 +164,7 @@ class Service implements ServiceInterface
 
         // Update status (to active), username and discriminator.
         $memberUsername = $memberObject->user->username ?? '';
-        $memberDiscriminator = $memberObject->user->discriminator ?? '';
+        $memberDiscriminator = (string)$memberObject->user->discriminator ?? '';
         if (!empty($memberUsername) && !empty($memberDiscriminator)) {
             $this->coreAccount->updateMemberData($memberUsername, $memberDiscriminator, $mainCharacter->playerId);
         }
@@ -237,7 +237,7 @@ class Service implements ServiceInterface
         $kickDiscordIds = array_diff($discordUserIds, $localDiscordIds);
         foreach ($kickDiscordIds as $kickDiscordId) {
             if (!in_array($kickDiscordId, $this->config->doNotKick) && !$this->config->disableKicks) {
-                $result = $this->discordServer->kickMember((string)$kickDiscordId);
+                $result = $this->discordServer->kickMember($kickDiscordId);
                 if ($result !== null) {
                     $this->logger->log("Kicked $kickDiscordId (no Neucore service account).");
                 }
@@ -273,20 +273,20 @@ class Service implements ServiceInterface
      * @param int[] $accountGroupIds
      * @param string[] $memberRoleIds
      */
-    private function assignRoles(array $accountGroupIds, array $memberRoleIds, string $discordUserId): bool
+    private function assignRoles(array $accountGroupIds, array $memberRoleIds, int $discordUserId): bool
     {
         $rolesToManage = [];
         $shouldHaveRoles = [];
         foreach ($this->config->roleConfig as $roleId => $groupIds) {
-            $rolesToManage[] = (string) $roleId;
+            $rolesToManage[] = $roleId;
             if (!empty(array_intersect($groupIds, $accountGroupIds))) {
-                $shouldHaveRoles[] = (string) $roleId;
+                $shouldHaveRoles[] = $roleId;
             }
         }
         $rolesToRemove = [];
         foreach ($memberRoleIds as $memberRoleId) {
             if (!in_array($memberRoleId, $shouldHaveRoles) && in_array($memberRoleId, $rolesToManage)) {
-                $rolesToRemove[] = $memberRoleId;
+                $rolesToRemove[] = (int)$memberRoleId;
             }
         }
         $rolesToAdd = [];
@@ -315,14 +315,14 @@ class Service implements ServiceInterface
         return $roleSuccess;
     }
 
-    private function assignChannels(array $accountGroupIds, string $discordUserId): bool
+    private function assignChannels(array $accountGroupIds, int $discordUserId): bool
     {
         $overallSuccess = true;
         foreach ($this->config->channelConfig as $channelId => $groupIds) {
 
             // Fetch channels
             if (!isset($this->channels[$channelId])) {
-                $channel = $this->discordServer->getChannel((string)$channelId);
+                $channel = $this->discordServer->getChannel($channelId);
                 if ($channel) {
                     $this->channels[$channelId] = $channel;
                 } else {
@@ -336,7 +336,7 @@ class Service implements ServiceInterface
             $isMember = false;
             $updateChannel = false;
             foreach ($this->channels[$channelId]->permission_overwrites as $key => $permission) {
-                if ($permission->type === 'member' && $permission->id === $discordUserId) {
+                if ($permission->type === 'member' && (int)$permission->id === $discordUserId) {
                     $isMember = true;
                     if (!$shouldBeMember) {
                         unset($this->channels[$channelId]->permission_overwrites[$key]);
@@ -347,7 +347,7 @@ class Service implements ServiceInterface
             }
             if ($shouldBeMember && !$isMember) {
                 // "View Channel" + "Connect" for voice channels, otherwise only "View Channel"
-                $permissionBit = (int) $this->channels[$channelId]->type === 2 ? 1049600 : 1024;
+                $permissionBit = (int)$this->channels[$channelId]->type === 2 ? 1049600 : 1024;
                 // https://discord.com/developers/docs/resources/channel#overwrite-object
                 $this->channels[$channelId]->permission_overwrites[] = (object)[
                     'id' => $discordUserId,
@@ -361,7 +361,7 @@ class Service implements ServiceInterface
             // Update channel
             if ($updateChannel) {
                 $success = $this->discordServer->updateChannelPermission(
-                    (string) $channelId,
+                    $channelId,
                     array_values($this->channels[$channelId]->permission_overwrites)
                 );
                 if ($success) {
@@ -426,7 +426,7 @@ class Service implements ServiceInterface
         if (!$info) {
             return $this->buildCallbackResponse($response, 'Failed: Could not retrieve Discord user id.');
         }
-        $userId = $info['userId'];
+        $userId = (int)$info['userId'];
         $username = $info['username'];
         $discriminator = $info['discriminator'];
 

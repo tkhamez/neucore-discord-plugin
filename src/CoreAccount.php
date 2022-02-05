@@ -48,7 +48,7 @@ class CoreAccount
         $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (isset($accounts[0])) {
             return new ServiceAccountData(
-                (int) $accounts[0]['character_id'],
+                (int)$accounts[0]['character_id'],
                 $accounts[0]['username'] .
                     ($accounts[0]['username'] !== Service::USERNAME_NA ? '#' . $accounts[0]['discriminator'] : ''),
                 null,
@@ -84,10 +84,10 @@ class CoreAccount
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, int>|null
      * @throws Exception
      */
-    public function getMemberData(int $playerId): array
+    public function getMemberData(int $playerId): ?array
     {
         /** @noinspection SqlResolve */
         $stmt = $this->getPDO()->prepare(
@@ -101,10 +101,10 @@ class CoreAccount
         }
         $resultAccount = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return [
-            'characterId' => $resultAccount[0] ? (int) $resultAccount[0]['character_id'] : 0,
-            'discordId' => $resultAccount[0]['discord_id'] ?? ''
-        ];
+        return isset($resultAccount[0]) ? [
+            'characterId' => (int)$resultAccount[0]['character_id'],
+            'discordId' => (int)$resultAccount[0]['discord_id'],
+        ] : null;
     }
 
     /**
@@ -141,7 +141,7 @@ class CoreAccount
 
     /**
      * @param int|null $playerId Must be provided if $discordIds is null.
-     * @param string[]|null $discordIds Must be provided if $playerId is null, will be ignored if $playerId
+     * @param int[]|null $discordIds Must be provided if $playerId is null, will be ignored if $playerId
      *        is not null.
      * @param string $status
      * @throws Exception
@@ -197,8 +197,8 @@ class CoreAccount
     }
 
     /**
-     * @param string[] $discordUserIds
-     * @return string[]
+     * @param int[] $discordUserIds
+     * @return int[]
      * @throws Exception
      */
     public function getDiscordIds(array $discordUserIds): array
@@ -219,7 +219,7 @@ class CoreAccount
             $localDiscordIds = array_merge(
                 $localDiscordIds,
                 array_map(function (array $row) {
-                    return $row['discord_id'];
+                    return (int)$row['discord_id'];
                 }, $stmt->fetchAll(PDO::FETCH_ASSOC))
             );
         }
@@ -250,7 +250,7 @@ class CoreAccount
     /**
      * @throws Exception
      */
-    public function deleteOtherAccounts(string $discordUserId, int $playerId): bool
+    public function deleteOtherAccounts(int $discordUserId, int $playerId): bool
     {
         /** @noinspection SqlResolve */
         $stmt = $this->getPDO()->prepare(
@@ -289,7 +289,7 @@ class CoreAccount
      */
     public function updateAccount(
         CoreCharacter $coreCharacter,
-        string $discordUserId,
+        int $discordUserId,
         string $username,
         string $discriminator
     ): bool {
