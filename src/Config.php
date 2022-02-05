@@ -38,6 +38,11 @@ class Config
      */
     public array $doNotKick = [];
 
+    /**
+     * @var int[]
+     */
+    public array $noNicknameChange = [];
+
     public bool $disableKicks = false;
 
     public string $nickname = '';
@@ -86,6 +91,7 @@ class Config
             $this->channelConfig[(int)$channelId] = array_map('intval', $channelGroupIds);
         }
         $this->doNotKick = array_map('intval', $config['DoNotKick'] ?? []);
+        $this->noNicknameChange = array_map('intval', $config['NoNicknameChange'] ?? []);
         $this->disableKicks = (bool) ($config['DisableKicks'] ?? false);
         $this->nickname = (string)($config['Nickname'] ?? '');
     }

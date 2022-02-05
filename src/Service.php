@@ -41,6 +41,11 @@ class Service implements ServiceInterface
     private array $discordMembers = [];
 
     /**
+     * @var array<int, int[]>
+     */
+    private array $discordMemberRoles = [];
+
+    /**
      * Cache of discord channel permissions to reduce API request.
      *
      * This property is updated when the channel is modified.
@@ -189,7 +194,7 @@ class Service implements ServiceInterface
             return;
         }
 
-        // Add and remove roles
+        // Add and remove roles - populates $this->discordMemberRoles arrays
         $roleSuccess = $this->assignRoles($accountGroupIds, $memberObject->roles, $discordUserId);
         if (!$roleSuccess) {
             throw new Exception('Failed add/remove role(s).');
@@ -202,7 +207,10 @@ class Service implements ServiceInterface
         }
 
         // Update Discord nickname
-        if (!$this->discordServer->setNickname($discordUserId, $mainCharacter, $memberObject->nick)) {
+        if (
+            count(array_intersect($this->discordMemberRoles[$discordUserId], $this->config->noNicknameChange)) === 0 &&
+            !$this->discordServer->setNickname($discordUserId, $mainCharacter, $memberObject->nick)
+        ) {
             throw new Exception('Failed to change nickname.');
         }
     }
@@ -270,11 +278,14 @@ class Service implements ServiceInterface
     }
 
     /**
+     * Adds and removes roles and stores them in self::$discordMemberRoles for each member.
+     *
      * @param int[] $accountGroupIds
      * @param string[] $memberRoleIds
      */
     private function assignRoles(array $accountGroupIds, array $memberRoleIds, int $discordUserId): bool
     {
+        $this->discordMemberRoles[$discordUserId] = $memberRoleIds;
         $rolesToManage = [];
         $shouldHaveRoles = [];
         foreach ($this->config->roleConfig as $roleId => $groupIds) {
@@ -299,6 +310,10 @@ class Service implements ServiceInterface
         foreach ($rolesToRemove as $roleToRemove) {
             $resultRemove = $this->discordServer->removeRole($discordUserId, $roleToRemove);
             if ($resultRemove !== null) {
+                $hasRoleKey = array_search($roleToRemove, $this->discordMemberRoles[$discordUserId]);
+                if ($hasRoleKey !== false) {
+                    unset($this->discordMemberRoles[$discordUserId][$hasRoleKey]);
+                }
                 $this->logger->log("Removed role $roleToRemove from $discordUserId.");
             } else {
                 $roleSuccess = false;
@@ -307,6 +322,7 @@ class Service implements ServiceInterface
         foreach ($rolesToAdd as $roleToAdd) {
             $resultAdd = $this->discordServer->addRole($discordUserId, $roleToAdd);
             if ($resultAdd !== null) {
+                $this->discordMemberRoles[$discordUserId][] = $roleToAdd;
                 $this->logger->log("Added role $roleToAdd to $discordUserId.");
             } else {
                 $roleSuccess = false;

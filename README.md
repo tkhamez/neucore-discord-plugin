@@ -15,6 +15,7 @@ Features in detail:
 - The bot changes the nickname of members to `EVE Character Name [Corporation Ticker]` by default. If a pattern is 
   specified for the "Nickname" configuration, it must contain `{characterName}`. Other available placeholders are 
   `{corporationTicker}` and `{allianceTicker}`. The maximum length for nicknames is 32 characters.
+- Option to disable nickname changes for specific roles.
 - The plugin also updates the Discord username and number that is shown in Neucore.
 - Any server member that does not have an account on Neucore will be kicked, except for the server owner and bots.
 - Configurable list of Discord users that will never be kicked, even if they do not have a Neucore account.
@@ -101,6 +102,7 @@ Notes:
   Channels:
     654: [9] # Discord channel ID: Neucore group ID
   Nickname: '{characterName} [{corporationTicker}]'
+  NoNicknameChange: [654, 456] # Discord role IDs
   DoNotKick: # These members will never be kicked
   - 543 # Discord user ID
   DisableKicks: false
@@ -118,6 +120,10 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 ```
 
 ## Changelog:
+
+2022-02-05
+
+- Added option to disable nickname changes for specific roles.
 
 2022-01-22
 
