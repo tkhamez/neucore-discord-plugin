@@ -1,6 +1,6 @@
 {
     "name": "tkhamez/neucore-discord-plugin",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "require": {
         "php": "^7.4|^8.0",
@@ -9,7 +9,9 @@
         "ext-pdo": "*",
         "tkhamez/neucore-plugin": "^0.7.0",
         "guzzlehttp/guzzle": "^7.3",
-        "symfony/yaml": "^5.3",
+        "symfony/yaml": "^5.3"
+    },
+    "require-dev": {
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {

@@ -1,25 +1,27 @@
 # Neucore Discord Plugin
 
-A service plugin for [Neucore](https://github.com/tkhamez/neucore).
-
 A Discord bot that can add and remove members from a server, manage member roles, channel membership and set nicknames.
 
+This is a service plugin for [Neucore](https://github.com/tkhamez/neucore). It can also be used as a 
+library in other projects: `composer require tkhamez/neucore-discord-plugin`.
+
 Features in detail:
-- Several service configuration can be added to Neucore for different Discord servers.
+- Adding new members to a Discord server via OAuth.
 - Optionally configurable Neucore groups that are necessary to be added to the server. If a member looses those
   groups they will be kicked.
 - Configurable Discord roles that are added or removed based on Neucore groups. Any role that is not in this
   configuration is never added or removed from any member.
-- Configurable channels to which members can be added and removed directly without using a role, based on 
+- Configurable channels to which members can be added and removed directly without using a role, based on
   Neucore groups. This only works for less than 100 members!
 - The bot changes the nickname of members to `EVE Character Name [Corporation Ticker]` by default. If a pattern is 
   specified for the "Nickname" configuration, it must contain `{characterName}`. Other available placeholders are 
   `{corporationTicker}` and `{allianceTicker}`. The maximum length for nicknames is 32 characters.
 - Option to disable nickname changes for specific roles.
 - The plugin also updates the Discord username and number that is shown in Neucore.
-- Any server member that does not have an account on Neucore will be kicked, except for the server owner and bots.
+- Optional: Any server member that does not have an account on Neucore can be kicked, except for the server 
+  owner and bots.
 - Configurable list of Discord users that will never be kicked, even if they do not have a Neucore account.
-- Option to disable the function that kicks members.
+- Several service configuration can be added to Neucore for different Discord servers.
 
 Notes:
 - The user token that is created during the invitation process is not store, it's safe to revoke it, or
@@ -39,7 +41,7 @@ Notes:
 
 ## Requirements
 
-- A [Neucore](https://github.com/tkhamez/neucore) installation.
+- A [Neucore](https://github.com/tkhamez/neucore) installation or your own project.
 - A MySQL or Maria DB database.
 
 ## Setup Discord Server and App
@@ -120,6 +122,10 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 ```
 
 ## Changelog:
+
+Version 1.0.0, 2022-04-23
+
+- Added to Packagist.
 
 2022-02-05
 
