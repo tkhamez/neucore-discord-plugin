@@ -242,13 +242,15 @@ class Service implements ServiceInterface
         }
 
         // Kick server members (that were added otherwise to the server) that do not exist in the local database
-        $localDiscordIds = $this->coreAccount->getDiscordIds($discordUserIds);
-        $kickDiscordIds = array_diff($discordUserIds, $localDiscordIds);
-        foreach ($kickDiscordIds as $kickDiscordId) {
-            if (!in_array($kickDiscordId, $this->config->doNotKick) && !$this->config->disableKicks) {
-                $result = $this->discordServer->kickMember($kickDiscordId);
-                if ($result !== null) {
-                    $this->logger->log("Kicked $kickDiscordId (no Neucore service account).");
+        if (!$this->config->disableKicks) {
+            $localDiscordIds = $this->coreAccount->getDiscordIds($discordUserIds);
+            $kickDiscordIds = array_diff($discordUserIds, $localDiscordIds);
+            foreach ($kickDiscordIds as $kickDiscordId) {
+                if (!in_array($kickDiscordId, $this->config->doNotKick)) {
+                    $result = $this->discordServer->kickMember($kickDiscordId);
+                    if ($result !== null) {
+                        $this->logger->log("Kicked $kickDiscordId (no Neucore service account).");
+                    }
                 }
             }
         }
