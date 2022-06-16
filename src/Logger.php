@@ -22,7 +22,7 @@ class Logger
 
     public function logException(Throwable $e, string $function): void
     {
-        $this->logError('Exception: "' . $e->getMessage() . "\" in $function() at " . __FILE__);
+        $this->logError('Exception: "' . $e->getMessage() . "\" in $function().");
     }
 
     public function logError(string $message): void

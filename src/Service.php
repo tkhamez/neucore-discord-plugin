@@ -490,6 +490,8 @@ class Service implements ServiceInterface
                 return $this->buildCallbackResponse($response, 'Failed: You are banned on this Discord server.');
             }
             return $this->buildCallbackResponse($response, 'Failed: Could not add member to Discord server.');
+        } else {
+            $this->logger->log("Added $userId to server.");
         }
 
         // Set nickname
