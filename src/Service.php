@@ -127,6 +127,7 @@ class Service implements ServiceInterface
         $resultAccount = $this->coreAccount->getMemberData($mainCharacter->playerId);
         $characterId = (int)$resultAccount['characterId'];
         $discordUserId = (int)$resultAccount['discordId'];
+        $additionalLogInfo = "(Discord user ID: $discordUserId, EVE character ID: $characterId)";
         if (empty($discordUserId)) {
             return;
         }
@@ -139,7 +140,7 @@ class Service implements ServiceInterface
         ) {
             $result = $this->discordServer->kickMember($discordUserId);
             if ($result === null) { // error
-                throw new Exception('Failed to kick.');
+                throw new Exception("Failed to kick $additionalLogInfo.");
             }
             $this->logger->log("Kicked $discordUserId (no main).");
             $this->coreAccount->deleteAccount($mainCharacter->playerId);
@@ -163,7 +164,7 @@ class Service implements ServiceInterface
                 return;
             }
             if (!isset($memberObject->roles)) {
-                throw new Exception('Failed to read member roles.');
+                throw new Exception("Failed to read member roles $additionalLogInfo.");
             }
         }
 
@@ -183,7 +184,7 @@ class Service implements ServiceInterface
         ) {
             $result = $this->discordServer->kickMember($discordUserId);
             if ($result === null) { // error
-                throw new Exception('Failed to kick.');
+                throw new Exception("Failed to kick $additionalLogInfo.");
             }
             $this->logger->log("Kicked $discordUserId (missing required group).");
             $this->coreAccount->updateAccountStatus(
@@ -197,13 +198,13 @@ class Service implements ServiceInterface
         // Add and remove roles - populates $this->discordMemberRoles arrays
         $roleSuccess = $this->assignRoles($accountGroupIds, $memberObject->roles, $discordUserId);
         if (!$roleSuccess) {
-            throw new Exception('Failed add/remove role(s).');
+            throw new Exception("Failed add/remove role(s) $additionalLogInfo.");
         }
 
         // Manage channel memberships
         $channelSuccess = $this->assignChannels($accountGroupIds, $discordUserId);
         if (!$channelSuccess) {
-            throw new Exception('Failed add/remove channels(s).');
+            throw new Exception("Failed add/remove channels(s) $additionalLogInfo.");
         }
 
         // Update Discord nickname
@@ -211,7 +212,7 @@ class Service implements ServiceInterface
             count(array_intersect($this->discordMemberRoles[$discordUserId], $this->config->noNicknameChange)) === 0 &&
             !$this->discordServer->setNickname($discordUserId, $mainCharacter, $memberObject->nick)
         ) {
-            throw new Exception('Failed to change nickname.');
+            throw new Exception("Failed to change nickname $additionalLogInfo.");
         }
     }
 

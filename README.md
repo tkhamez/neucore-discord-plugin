@@ -123,6 +123,10 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
+Next
+
+- Added Discord user ID and EVE character ID to some error messages, e.g. if a kick failed.
+
 Version 1.0.0, 2022-04-23
 
 - Added to Packagist.
