@@ -147,11 +147,6 @@ class Service implements ServiceInterface
             return;
         }
 
-        // Update character ID of service account if main changed.
-        if ($characterId !== $mainCharacter->id) {
-            $this->coreAccount->updateCharacterId($mainCharacter);
-        }
-
         // Get member data from Discord (roles, nick, username, discriminator)
         $memberObject = $this->discordMembers[$discordUserId] ?? $this->discordServer->getMemberData($discordUserId);
         if (!is_object($memberObject)) {
@@ -218,6 +213,9 @@ class Service implements ServiceInterface
         if ($mainCharacter->id === 0) {
             // Remove service account from empty Core account.
             $this->coreAccount->deleteAccount($mainCharacter->playerId);
+        } elseif ($characterId !== $mainCharacter->id) {
+            // Update character ID of service account if main changed.
+            $this->coreAccount->updateCharacterId($mainCharacter);
         }
     }
 
