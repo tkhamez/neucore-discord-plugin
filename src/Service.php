@@ -214,6 +214,11 @@ class Service implements ServiceInterface
         ) {
             throw new Exception("Failed to change nickname $additionalLogInfo.");
         }
+
+        if ($mainCharacter->id === 0) {
+            // Remove service account from empty Core account.
+            $this->coreAccount->deleteAccount($mainCharacter->playerId);
+        }
     }
 
     public function resetPassword(int $characterId): string

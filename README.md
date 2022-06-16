@@ -127,6 +127,7 @@ Next
 
 - Added Discord user ID and EVE character ID to some error messages, e.g. if a kick failed.
 - The nickname is now removed if there is no longer a main character on Core.
+- Service accounts are now removed from Core accounts that no longer have a character.
 
 Version 1.0.0, 2022-04-23
 
