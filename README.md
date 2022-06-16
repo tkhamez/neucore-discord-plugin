@@ -126,6 +126,7 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 Next
 
 - Added Discord user ID and EVE character ID to some error messages, e.g. if a kick failed.
+- The nickname is now removed if there is no longer a main character on Core.
 
 Version 1.0.0, 2022-04-23
 

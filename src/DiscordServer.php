@@ -140,15 +140,21 @@ class DiscordServer
     {
         $this->lastRequestError = null;
 
-        $pattern = $this->config->nickname;
-        if (strpos($pattern, '{characterName}') === false) {
-            $pattern = '{characterName} [{corporationTicker}]';
+        if ((string)$character->name === '') {
+            // It's possible that the character does not exist (service account on empty Core account).
+            $newNickname = '';
+        } else {
+            $pattern = $this->config->nickname;
+            if (strpos($pattern, '{characterName}') === false) {
+                $pattern = '{characterName} [{corporationTicker}]';
+            }
+            $newNickname = mb_substr(str_replace(
+                ['{characterName}', '{corporationTicker}', '{allianceTicker}'],
+                [$character->name, $character->corporationTicker, $character->allianceTicker],
+                $pattern
+            ), 0, 32);
         }
-        $newNickname = mb_substr(str_replace(
-            ['{characterName}', '{corporationTicker}', '{allianceTicker}'],
-            [$character->name, $character->corporationTicker, $character->allianceTicker],
-            $pattern
-        ), 0, 32);
+
         if ($currentNickname === $newNickname) {
             return true;
         }
