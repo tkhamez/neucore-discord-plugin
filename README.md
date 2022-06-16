@@ -123,13 +123,13 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
-Next
+Version 1.0.1, 2022-06-16
 
+- Fix: The nickname is now removed if there is no longer a main character on Core.
+- Fix: Service accounts are now removed from Core accounts that no longer have a character. This also fixes an 
+  integrity constraint violation for `character_id` if it's 0.
 - Added Discord user ID and EVE character ID to some error messages, e.g. if a kick failed.
 - Added log entry when a user was added to the server.
-- The nickname is now removed if there is no longer a main character on Core.
-- Service accounts are now removed from Core accounts that no longer have a character. This also fixes an 
-  integrity constraint violation for `character_id` if it's 0.
 
 Version 1.0.0, 2022-04-23
 
