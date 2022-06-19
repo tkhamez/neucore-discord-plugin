@@ -1,7 +1,7 @@
 
 create table discord_accounts1
 (
-    character_id  int          null,
+    character_id  int          not null,
     player_id     int          not null,
     discord_id    bigint       null,
     member_status varchar(32)  not null,
