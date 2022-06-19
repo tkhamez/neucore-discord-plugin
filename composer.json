@@ -7,7 +7,7 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-pdo": "*",
-        "tkhamez/neucore-plugin": "^0.7.1",
+        "tkhamez/neucore-plugin": "^0.8.0",
         "guzzlehttp/guzzle": "^7.3",
         "symfony/yaml": "^5.3"
     },

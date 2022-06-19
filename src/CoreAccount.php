@@ -324,6 +324,47 @@ class CoreAccount
     /**
      * @throws Exception
      */
+    public function moveAccount(int $fromPlayerId, int $toPlayerId): bool
+    {
+        $retVal = false;
+
+        $this->getPDO()->beginTransaction();
+
+        /** @noinspection SqlResolve */
+        $stmt1 = $this->getPDO()->prepare("SELECT player_id FROM {$this->config->tableName} WHERE player_id = ?");
+        try {
+            $stmt1->execute([$toPlayerId]);
+        } catch (PDOException $e) {
+            $this->logger->logException($e, __FUNCTION__);
+            return false;
+        }
+
+        if ($stmt1->rowCount() === 0) {
+
+            /** @noinspection SqlResolve */
+            $stmt2 = $this->getPDO()->prepare(
+                "UPDATE {$this->config->tableName} SET player_id = :to WHERE player_id = :from"
+            );
+            try {
+                $stmt2->execute([':to' => $toPlayerId, ':from' => $fromPlayerId]);
+            } catch (PDOException $e) {
+                $this->logger->logException($e, __FUNCTION__);
+            }
+
+            try {
+                $this->getPDO()->commit();
+                $retVal = true;
+            } catch (PDOException $E) {
+                $this->getPDO()->rollBack();
+            }
+        }
+
+        return $retVal;
+    }
+
+    /**
+     * @throws Exception
+     */
     private function getPDO(): PDO
     {
         if ($this->pdo === null) {

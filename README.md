@@ -123,6 +123,10 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
+Next
+
+- Update to plugin version 0.8.0.
+
 Version 1.0.1, 2022-06-16
 
 - Fix: The nickname is now removed if there is no longer a main character on Core.

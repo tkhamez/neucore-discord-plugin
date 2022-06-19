@@ -219,6 +219,11 @@ class Service implements ServiceInterface
         }
     }
 
+    public function moveServiceAccount(int $toPlayerId, int $fromPlayerId): bool
+    {
+        return $this->coreAccount->moveAccount($fromPlayerId, $toPlayerId);
+    }
+
     public function resetPassword(int $characterId): string
     {
         throw new Exception();
