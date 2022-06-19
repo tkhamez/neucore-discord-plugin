@@ -33,8 +33,8 @@ class CoreAccount
         $placeholders = implode(',', array_fill(0, count($characterIds), '?'));
         /** @noinspection SqlResolve */
         $stmt = $this->getPDO()->prepare(
-        // Will return max 1 account because all characters from the parameter are on the same account.
-        // Limit by player_id to exclude characters that were moved to another account.
+            // Will return max 1 account because all characters from the parameter are on the same account.
+            // Limit by player_id to exclude characters that were moved to another account.
             "SELECT character_id, player_id, username, discriminator, member_status
             FROM {$this->config->tableName}
             WHERE character_id IN ($placeholders) AND player_id = ?"
