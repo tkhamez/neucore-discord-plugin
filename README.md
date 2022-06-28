@@ -123,7 +123,7 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
-Next
+Version 2.0.0, 2022-06-28
 
 - Update to plugin version 0.8.0.
 - Changed DB schema: character_id is now "not null" (`alter table table_name modify character_id int not null`).
