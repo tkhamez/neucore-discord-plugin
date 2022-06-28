@@ -127,6 +127,7 @@ Next
 
 - Update to plugin version 0.8.0.
 - Changed DB schema: character_id is now "not null" (`alter table table_name modify character_id int not null`).
+- Exceptions from the player update during the callback request are now caught.
 
 Version 1.0.1, 2022-06-16
 

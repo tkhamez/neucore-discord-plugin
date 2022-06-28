@@ -284,7 +284,15 @@ class Service implements ServiceInterface
             return $this->requestLogin($response);
         } elseif ($name === 'callback') {
             $response = $this->requestCallback($coreCharacter, $request, $response);
-            $this->updatePlayerAccount($coreCharacter, $groups);
+            try {
+                $this->updatePlayerAccount($coreCharacter, $groups);
+            } catch (Exception $e) {
+                // Ignore errors from the update here, just log.
+                $this->logger->log(
+                    "Request callback: Error from updatePlayerAccount() for Core player $coreCharacter->playerId: " .
+                    $e->getMessage()
+                );
+            }
             return $response;
         }
         $response->getBody()->write('404 Not Found.');
