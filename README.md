@@ -8,18 +8,16 @@ library in other projects: `composer require tkhamez/neucore-discord-plugin`.
 Features in detail:
 - Adding new members to a Discord server via OAuth.
 - Optionally configurable Neucore groups that are necessary to be added to the server. If a member looses those
-  groups they will be kicked.
+  groups they will be kicked (if kicks are enabled).
 - Configurable Discord roles that are added or removed based on Neucore groups. Any role that is not in this
   configuration is never added or removed from any member.
 - Configurable channels to which members can be added and removed directly without using a role, based on
-  Neucore groups. This only works for less than 100 members!
+  Neucore groups. This only works for less than 100 members per channel!
 - The bot changes the nickname of members to `EVE Character Name [Corporation Ticker]` by default. If a pattern is 
   specified for the "Nickname" configuration, it must contain `{characterName}`. Other available placeholders are 
   `{corporationTicker}` and `{allianceTicker}`. The maximum length for nicknames is 32 characters.
 - Option to disable nickname changes for specific roles.
 - The plugin also updates the Discord username and number that is shown in Neucore.
-- Optional: Any server member that does not have an account on Neucore can be kicked, except for the server 
-  owner and bots.
 - Configurable list of Discord users that will never be kicked, even if they do not have a Neucore account.
 - Several service configuration can be added to Neucore for different Discord servers.
 
@@ -33,7 +31,9 @@ Notes:
 - If all characters were removed from the Neucore player account, the member is kicked from the Discord server.
 - If a member was added in another way to the Discord server, and they are already associated with a Neucore service
   account, that account status is changed to active and then updated normally (which could mean that the member is 
-  kicked again). If there is no associated Neucore service account, the user is also kicked.
+  kicked again). If there is no associated Neucore service account, the user is also kicked (if kicks are enabled).
+- The server owner and bots are never kicked.
+- If kicks are disabled, the bot will not change the roles of members who have not registered via Neucore.
 - Members added to a channel are granted the "View Channel" permission for that channel and additionally "Connect"
   for voice channels, other permissions must be granted by roles or manually.
 - The bot only manages roles and channels for members who have signed up via Neucore. Members added in other ways 
@@ -55,7 +55,9 @@ Notes:
 - Add bot.
 - Enable `Server Members Intent`.
 - Go back to OAuth2 -> URL Generator, at "Scopes" check `bot` and then the following bot permissions:  
-  `Manage Roles`, `Manage Channels`, `Kick Members`, `Create Instant Invite`, `Manage Nicknames`.
+  `Manage Roles`, `Manage Channels`, `Kick Members`, `Create Instant Invite`, `Manage Nicknames`.  
+  Or use the following link, replace `[your-client-ID]` with your application ID:  
+  https://discord.com/api/oauth2/authorize?client_id=[your-client-ID]&permissions=402653203&scope=bot
 - Copy the URL and open it in the browser to add the bot to your server.
 - On your server go to Settings -> Roles and drag the role of the bot above the roles it will be managing. Also, 
   drag the bot role over any role that has a member you want the bot to set the nickname for.

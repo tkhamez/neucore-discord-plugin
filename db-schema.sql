@@ -1,5 +1,5 @@
 
-create table discord_accounts1
+create table discord1
 (
     character_id  int          not null,
     player_id     int          not null,
@@ -9,10 +9,10 @@ create table discord_accounts1
     discriminator varchar(8)   null,
     created       datetime     null,
     updated       datetime     null,
-    constraint discord_accounts1_character_id_uindex unique (character_id),
-    constraint discord_accounts1_discord_id_uindex unique (discord_id),
-    constraint discord_accounts1_player_id_uindex unique (player_id)
+    constraint discord1_character_id_uindex unique (character_id),
+    constraint discord1_discord_id_uindex unique (discord_id),
+    constraint discord1_player_id_uindex unique (player_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-create index discord_accounts1_status_index on discord_accounts1 (member_status);
-create index discord_accounts1_updated_index on discord_accounts1 (updated);
+create index discord1_status_index on discord1 (member_status);
+create index discord1_updated_index on discord1 (updated);
