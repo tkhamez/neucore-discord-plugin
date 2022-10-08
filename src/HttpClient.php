@@ -68,15 +68,17 @@ class HttpClient
         $result = $this->sendRequest($method, $url, $headers, $body);
 
         // Store rate limit info, do not use X-RateLimit-Reset in case the local time is wrong.
-        $rateLimitRemaining = $this->lastResponse->getHeader(self::RATE_LIMIT_REMAIN)[0] ?? '';
-        $rateLimitResetAfter = $this->lastResponse->getHeader(self::RATE_LIMIT_RESET_AFTER)[0] ?? '';
-        $rateLimitBucket = $this->lastResponse->getHeader(self::RATE_LIMIT_BUCKET)[0] ?? '';
-        if ($rateLimitRemaining !== '' && !empty($rateLimitResetAfter) && !empty($rateLimitBucket)) {
-            $this->rateLimits[$rateLimitBucket] = [
-                'remaining' => (int)$rateLimitRemaining,
-                'resetAfter' => (float)$rateLimitResetAfter,
-                'time' => microtime(true),
-            ];
+        if ($this->lastResponse) {
+            $rateLimitRemaining = $this->lastResponse->getHeader(self::RATE_LIMIT_REMAIN)[0] ?? '';
+            $rateLimitResetAfter = $this->lastResponse->getHeader(self::RATE_LIMIT_RESET_AFTER)[0] ?? '';
+            $rateLimitBucket = $this->lastResponse->getHeader(self::RATE_LIMIT_BUCKET)[0] ?? '';
+            if ($rateLimitRemaining !== '' && !empty($rateLimitResetAfter) && !empty($rateLimitBucket)) {
+                $this->rateLimits[$rateLimitBucket] = [
+                    'remaining' => (int)$rateLimitRemaining,
+                    'resetAfter' => (float)$rateLimitResetAfter,
+                    'time' => microtime(true),
+                ];
+            }
         }
         if ($this->lastResponseErrorCode === 429) {
             $parsedBody = json_decode($this->lastResponseErrorBody, true);
@@ -100,6 +102,7 @@ class HttpClient
         #$this->logger->log([$method, $url, $headers, $body], \Psr\Log\LogLevel::DEBUG);
         #$this->logger->log("$method, $url", \Psr\Log\LogLevel::DEBUG);
 
+        $this->lastResponse = null;
         $this->lastResponseErrorCode = 0;
         $this->lastResponseErrorBody = '';
 
