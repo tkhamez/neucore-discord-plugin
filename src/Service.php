@@ -252,15 +252,28 @@ class Service implements ServiceInterface
             $this->coreAccount->updateAccountStatus(null, $chunks, ServiceAccountData::STATUS_ACTIVE);
         }
 
-        // Kick server members (that were added otherwise to the server) that do not exist in the local database
+        // Get all Discord member IDs that do not exist in the local database.
+        $localDiscordIds = $this->coreAccount->getDiscordIds($discordUserIds);
+        $missingDiscordIds = array_diff($discordUserIds, $localDiscordIds);
+
         if (!$this->config->disableKicks) {
-            $localDiscordIds = $this->coreAccount->getDiscordIds($discordUserIds);
-            $kickDiscordIds = array_diff($discordUserIds, $localDiscordIds);
-            foreach ($kickDiscordIds as $kickDiscordId) {
+            // Kick server members that do not exist in the local database
+            foreach ($missingDiscordIds as $kickDiscordId) {
                 if (!in_array($kickDiscordId, $this->config->doNotKick)) {
                     $result = $this->discordServer->kickMember($kickDiscordId);
                     if ($result !== null) {
                         $this->logger->log("Kicked $kickDiscordId (no Neucore service account).");
+                    }
+                }
+            }
+        } else {
+            // Remove roles from members that do not exist in the local database.
+            foreach ($missingDiscordIds as $removeRoleDiscordId) {
+                $memberObject = $this->discordMembers[$removeRoleDiscordId] ?? null;
+                if (is_object($memberObject)) { // Should always be true at this point
+                    $roleSuccess = $this->assignRoles([], $memberObject->roles, $removeRoleDiscordId);
+                    if (!$roleSuccess) {
+                        $this->logger->log("Failed to update roles of $removeRoleDiscordId.");
                     }
                 }
             }

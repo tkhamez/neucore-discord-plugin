@@ -31,13 +31,12 @@ Notes:
 - If all characters were removed from the Neucore player account, the member is kicked from the Discord server.
 - If a member was added in another way to the Discord server, and they are already associated with a Neucore service
   account, that account status is changed to active and then updated normally (which could mean that the member is 
-  kicked again). If there is no associated Neucore service account, the user is also kicked (if kicks are enabled).
+  kicked again). If there is no associated Neucore service account, the user is kicked if kicks are enabled.
+- If kicks are disabled, the bot will remove roles from the configuration from members who have not registered via 
+  Neucore.
 - The server owner and bots are never kicked.
-- If kicks are disabled, the bot will not change the roles of members who have not registered via Neucore.
 - Members added to a channel are granted the "View Channel" permission for that channel and additionally "Connect"
   for voice channels, other permissions must be granted by roles or manually.
-- The bot only manages roles and channels for members who have signed up via Neucore. Members added in other ways 
-  are not changed, but can be kicked depending on the configuration.
 
 ## Requirements
 
@@ -124,6 +123,11 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 ```
 
 ## Changelog:
+
+Version 2.1.0, 2022-11-05
+
+- Change: Roles from the configuration are now removed from server members who do not have a service account if
+  server kicks are disabled (otherwise they would be kicked).
 
 Version 2.0.0, 2022-06-28
 
