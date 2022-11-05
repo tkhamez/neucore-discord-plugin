@@ -34,6 +34,7 @@ Notes:
   kicked again). If there is no associated Neucore service account, the user is kicked if kicks are enabled.
 - If kicks are disabled, the bot will remove roles from the configuration from members who have not registered via 
   Neucore.
+- The bot cannot kick members with a role that is above the bot's role in the Discord configuration.
 - The server owner and bots are never kicked.
 - Members added to a channel are granted the "View Channel" permission for that channel and additionally "Connect"
   for voice channels, other permissions must be granted by roles or manually.
