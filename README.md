@@ -56,7 +56,7 @@ Notes:
 - Enable `Server Members Intent`.
 - Go back to OAuth2 -> URL Generator, at "Scopes" check `bot` and then the following bot permissions:  
   `Manage Roles`, `Manage Channels`, `Kick Members`, `Create Instant Invite`, `Manage Nicknames`.  
-  Or use the following link, replace `[your-client-ID]` with your application ID:  
+  Or use the following link, replace `[your-client-ID]` with your client ID (found on the OAuth2 page):  
   https://discord.com/api/oauth2/authorize?client_id=[your-client-ID]&permissions=402653203&scope=bot
 - Copy the URL and open it in the browser to add the bot to your server.
 - On your server go to Settings -> Roles and drag the role of the bot above the roles it will be managing. Also, 
