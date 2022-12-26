@@ -30,10 +30,7 @@ class Logger
         $this->log($message, LogLevel::ERROR);
     }
 
-    /**
-     * @param string|array|object $message
-     */
-    public function log($message, string $logLevel = LogLevel::INFO): void
+    public function log(object|array|string $message, string $logLevel = LogLevel::INFO): void
     {
         if (!is_scalar($message)) {
             $message = print_r($message, true);

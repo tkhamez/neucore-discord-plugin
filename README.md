@@ -125,6 +125,11 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
+Version 3.0.0
+
+- Raised minimum PHP version to 8.0 (from 7.4).
+- Updated to plugin version 0.9.0.
+
 Version 2.1.0, 2022-11-05
 
 - Change: Roles from the configuration are now removed from server members who do not have a service account if
@@ -132,7 +137,7 @@ Version 2.1.0, 2022-11-05
 
 Version 2.0.0, 2022-06-28
 
-- Update to plugin version 0.8.0.
+- Updated to plugin version 0.8.0.
 - Changed DB schema: character_id is now "not null" (`alter table table_name modify character_id int not null`).
 - Exceptions from the player update during the callback request are now caught.
 

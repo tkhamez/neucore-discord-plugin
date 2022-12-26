@@ -145,7 +145,7 @@ class DiscordServer
             $newNickname = '';
         } else {
             $pattern = $this->config->nickname;
-            if (strpos($pattern, '{characterName}') === false) {
+            if (!str_contains($pattern, '{characterName}')) {
                 $pattern = '{characterName} [{corporationTicker}]';
             }
             $newNickname = mb_substr(str_replace(

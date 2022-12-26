@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use Symfony\Component\Yaml\Yaml;
+use Neucore\Plugin\ObjectProvider;
 
 class Config
 {
@@ -56,9 +56,9 @@ class Config
         $this->parse($configurationData);
     }
 
-    public function parse(string $configurationData)
+    public function parse(string $configurationData): void
     {
-        $config = Yaml::parse($configurationData);
+        $config = ObjectProvider::getSymfonyYamlParser()->parse($configurationData);
 
         // required
         $this->tableName = (string)preg_replace(

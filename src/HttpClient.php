@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
+use Neucore\Plugin\ObjectProvider;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -164,11 +164,9 @@ class HttpClient
     private function getClient(): ClientInterface
     {
         if ($this->client === null) {
-            $this->client = new Client([
-                'headers' => [
-                    'User-Agent' => 'Neucore Discord Plugin (https://github.com/tkhamez/'.Service::PLUGIN_NAME.')',
-                ],
-            ]);
+            $this->client = ObjectProvider::getHttpClient(
+                'Neucore Discord Plugin (https://github.com/tkhamez/'.Service::PLUGIN_NAME.')'
+            );
         }
         return $this->client;
     }

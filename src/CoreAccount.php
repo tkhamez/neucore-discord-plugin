@@ -354,7 +354,7 @@ class CoreAccount
             try {
                 $this->getPDO()->commit();
                 $retVal = true;
-            } catch (PDOException $E) {
+            } catch (PDOException) {
                 $this->getPDO()->rollBack();
             }
         }

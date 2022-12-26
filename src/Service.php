@@ -312,6 +312,10 @@ class Service implements ServiceInterface
         return $response->withStatus(404);
     }
 
+    public function onConfigurationChange(): void
+    {
+    }
+
     /**
      * Adds and removes roles and stores them in self::$discordMemberRoles for each member.
      *
@@ -502,7 +506,7 @@ class Service implements ServiceInterface
                     ServiceAccountData::STATUS_ACTIVE,
                     $username
                 );
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // already logged
                 return $this->buildCallbackResponse($response, 'Failed: Could not create local service account.');
             }
