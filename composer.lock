@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7c6fab55f8941d2f3a5835e857dd791f",
+    "content-hash": "7a27181bf3e2e22d82cb9dde23cf32cb",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -817,16 +817,16 @@
         },
         {
             "name": "tkhamez/neucore-plugin",
-            "version": "0.9.0",
+            "version": "0.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tkhamez/neucore-plugin.git",
-                "reference": "e9c302b432e9f81f02bad0e3bde7ea726a6858c8"
+                "reference": "8d7679c3aff075dc68901dbf528ee7487c4d0b87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tkhamez/neucore-plugin/zipball/e9c302b432e9f81f02bad0e3bde7ea726a6858c8",
-                "reference": "e9c302b432e9f81f02bad0e3bde7ea726a6858c8",
+                "url": "https://api.github.com/repos/tkhamez/neucore-plugin/zipball/8d7679c3aff075dc68901dbf528ee7487c4d0b87",
+                "reference": "8d7679c3aff075dc68901dbf528ee7487c4d0b87",
                 "shasum": ""
             },
             "require": {
@@ -854,9 +854,9 @@
             "description": "Necessary classes to write a Neucore plugin.",
             "support": {
                 "issues": "https://github.com/tkhamez/neucore-plugin/issues",
-                "source": "https://github.com/tkhamez/neucore-plugin/tree/0.9.0"
+                "source": "https://github.com/tkhamez/neucore-plugin/tree/0.9.1"
             },
-            "time": "2022-12-25T20:43:12+00:00"
+            "time": "2022-12-27T12:42:30+00:00"
         }
     ],
     "packages-dev": [

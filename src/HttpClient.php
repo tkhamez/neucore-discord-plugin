@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use GuzzleHttp\Psr7\Request;
 use Neucore\Plugin\ObjectProvider;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -106,7 +105,7 @@ class HttpClient
         $this->lastResponseErrorCode = 0;
         $this->lastResponseErrorBody = '';
 
-        $request = new Request($method, $url, $headers, $body);
+        $request = ObjectProvider::createHttpRequest($method, $url, $headers, $body);
         try {
             $this->lastResponse = $this->getClient()->sendRequest($request);
         } catch (ClientExceptionInterface $e) {

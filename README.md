@@ -125,7 +125,7 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
-Version 3.0.0
+Version 3.0.0, 2022-12-26
 
 - Raised minimum PHP version to 8.0 (from 7.4).
 - Updated to plugin version 0.9.0.
