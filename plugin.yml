@@ -1,0 +1,89 @@
+
+###
+### Required configuration
+###
+
+# A name for the plugin
+name: Discord auth
+
+# Type of the plugin. The only possible value for now is "service".
+type: service
+
+# Full class name of class implementing Neucore\Plugin\ServiceInterface.
+phpClass: Neucore\Plugin\Discord\Service
+
+# PHP namespace that should be loaded by the PSR-4 autoloader.
+psr4Prefix: Neucore\Plugin\Discord
+
+# Relative (to this file) path to the directory containing the classes of the above namespace.
+psr4Path: src
+
+# Defines if this service allows only one account per player instead of one per character.
+oneAccount: true
+
+# List of available account properties, possible values: username, password, email, status, name
+properties:
+  - username
+  - status
+
+# If this is not enabled and the account contains a password (see properties), the user will be able to see
+# it only once after it is reset (see actions).
+showPassword: false
+
+# List of actions, possible values: update-account, reset-password
+actions:
+  - update-account
+
+
+###
+### Optional configuration
+###
+
+# List of link buttons. Placeholders for URL: {plugin_id}, {username}, {password}, {email}
+URLs:
+  -
+    url: /plugin/{plugin_id}/login
+    title: Request Invitation
+    target: _self
+  -
+    url: https://discord.com/login
+    title: Discord Login
+    target: _blank
+
+# Text above the list of accounts (supports multiline text).
+textTop: Account for a Discord Server.
+
+# Text below account table (supports multiline text).
+textAccount:
+  'Status Nonmember: Click "Request Invitation" to be added to the server. To do this, you will need to
+  log into your Discord account, allow access to your username, and allow the app to join servers for you.
+  After you have been successfully invited, you can deauthorize this app in your user settings if you wish.
+
+
+  Status Active: Click the "Update Account" button to sync your Core groups with Discord roles. This also 
+  happens automatically several times a day.'
+
+# Text below the registration form/button (supports multiline text).
+textRegister: Click "Register" to initialize your account.
+
+# Text below an account with status "pending" (supports multiline text).
+textPending:
+
+# Additional configuration for the plugin (supports multiline text).
+configurationData: |
+  TableName: database_table_name # Only allows the following chars: a-zA-Z0-9_
+  ServerId: 123 # Discord server ID
+  BotToken: abc # Discord application's bot token
+  OAuthRedirectUri: http://your.neucore.tld/plugin/{id}/callback
+  OAuthClientId: 456
+  OAuthClientSecret: def
+  Roles: # The Neucore player account needs one of these groups to get the Discord role
+    987: # Discord role ID
+    - 1 # Neucore group ID
+  Channels:
+    654: [9] # Discord channel ID: Neucore group ID
+  Nickname: '{characterName} [{corporationTicker}]'
+  NoNicknameChange: [654, 456] # Discord role IDs
+  DoNotKick: # These members will never be kicked
+  - 543 # Discord user ID
+  DisableKicks: false

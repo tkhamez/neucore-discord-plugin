@@ -75,42 +75,28 @@ Notes:
   NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username
   NEUCORE_DISCORD_PLUGIN_DB_PASSWORD=password
   ```
-- Add a new Neucore service.
-- Set PHP class (`Neucore\Plugin\Discord\Service`), PSR-4 prefix (`Neucore\Plugin\Discord`) and path 
-  (`/your/path/to/neucore-discord-plugin/src`).
-- Check "Limit to one service account". *This is **important**!*
+- Add a new Neucore service.   
+  The ID of it (found in the URL when the plugin is loaded) is needed for the 
+  redirect URL for the Discord app and for the `OAuthRedirectUri` value in the "Configuration Data" (see below).
+- Choose the "Discord auth" plugin from the configuration.
+- Adjust all values in the "Configuration Data" field at the bottom. The format is [YAML](https://yaml.org/).
+  - The following are required:
+    - TableName
+    - ServerId
+    - BotToken
+    - OAuthRedirectUri (also replace `{id}` in the URL with the service ID)
+    - OAuthClientId
+    - OAuthClientSecret
+  - The following are optional and may be removed:
+    - Roles
+    - Channels
+    - Nickname
+    - NoNicknameChange
+    - DoNotKick
+    - DisableKicks
 - Optionally add required groups.
-- Set Account Properties to: username,status.
-- Set Account Actions to: update-account
-- Add two link buttons:
-  - URL (replace `{id}` with your service ID): `/plugin/{id}/login`, Title: `Request Invitation`
-  - URL: `https://discord.com/login`, Title: `Discord Login`, Target: `_blank`
-- Text Register: Click "Register" to initialize your account.
-- Text Account:  
-  Status Nonmember: Click "Request Invitation" to be added to the server. To do this,  you will need to log 
-  into your Discord account, allow access to your username, and allow the app to join servers for you. After 
-  you have been successfully invited, you can deauthorize this app in your user settings if you wish.    
-  Status Active: Click the "Update Account" button to sync your Core groups with Discord roles. This also 
-  happens automatically several times a day.
-- Add the following in the "Configuration Data" text area (YAML format), replace with your values:
-  ```yaml
-  TableName: database_table_name # Only allows the following chars: a-zA-Z0-9_
-  ServerId: 123 # Discord server ID
-  BotToken: abc # Discord application's bot token
-  OAuthRedirectUri: http://your.neucore.tld/plugin/{id}/callback
-  OAuthClientId: 456
-  OAuthClientSecret: def
-  Roles: # The Neucore player account needs one of these groups to get the Discord role
-    987: # Discord role ID
-    - 1 # Neucore group ID
-  Channels:
-    654: [9] # Discord channel ID: Neucore group ID
-  Nickname: '{characterName} [{corporationTicker}]'
-  NoNicknameChange: [654, 456] # Discord role IDs
-  DoNotKick: # These members will never be kicked
-  - 543 # Discord user ID
-  DisableKicks: false
-  ```
+- Optionally adjust any texts.
+- Activate the plugin when done.
 
 ## Development:
 
@@ -124,6 +110,11 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 ```
 
 ## Changelog:
+
+Version 3.1.0, 2022-12-28
+
+- Added plugin.yml file (this adds compatibility with Neucore version >= 1.41.0) and updated documentation. 
+- Updated to plugin version 0.9.2.
 
 Version 3.0.0, 2022-12-26
 
