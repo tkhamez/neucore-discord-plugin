@@ -78,12 +78,10 @@ configurationData: |
   OAuthClientId: 456
   OAuthClientSecret: def
   Roles: # The Neucore player account needs one of these groups to get the Discord role
-    987: # Discord role ID
-    - 1 # Neucore group ID
+    987: [1] # Discord role ID: Neucore group ID
   Channels:
     654: [9] # Discord channel ID: Neucore group ID
   Nickname: '{characterName} [{corporationTicker}]'
   NoNicknameChange: [654, 456] # Discord role IDs
-  DoNotKick: # These members will never be kicked
-  - 543 # Discord user ID
+  DoNotKick: [543] # These members will never be kicked: Discord user ID
   DisableKicks: false
