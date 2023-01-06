@@ -368,8 +368,6 @@ class Account
      */
     public function find(string $query): array
     {
-        # TODO also find discord ID
-
         /** @noinspection SqlResolve */
         $stmt = $this->getPDO()->prepare(
             "SELECT character_id 
