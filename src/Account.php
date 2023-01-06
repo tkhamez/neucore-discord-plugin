@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use Neucore\Plugin\CoreCharacter;
+use Neucore\Plugin\Data\CoreCharacter;
+use Neucore\Plugin\Data\ServiceAccountData;
 use Neucore\Plugin\Exception;
-use Neucore\Plugin\ServiceAccountData;
 use PDO;
 use PDOException;
 
-class CoreAccount
+class Account
 {
     private Logger $logger;
 
@@ -360,6 +360,31 @@ class CoreAccount
         }
 
         return $retVal;
+    }
+
+    /**
+     * @return int[]
+     * @throws Exception
+     */
+    public function find(string $query): array
+    {
+        # TODO also find discord ID
+
+        /** @noinspection SqlResolve */
+        $stmt = $this->getPDO()->prepare(
+            "SELECT character_id 
+            FROM {$this->config->tableName} 
+            WHERE discord_id LIKE ? or username LIKE ? or discriminator LIKE ?"
+        );
+        try {
+            $stmt->execute(["%$query%", "%$query%", "%$query%"]);
+        } catch (PDOException $e) {
+            $this->logger->logException($e, __FUNCTION__);
+            throw new Exception();
+        }
+        return array_map(function (array $row) {
+            return (int)$row['character_id'];
+        }, $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     /**

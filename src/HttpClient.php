@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use Neucore\Plugin\ObjectProvider;
+use Neucore\Plugin\Core\FactoryInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -20,6 +20,8 @@ class HttpClient
 
     private Logger $logger;
 
+    private FactoryInterface $factory;
+
     private ?ClientInterface $client = null;
 
     private int $lastResponseErrorCode = 0;
@@ -33,9 +35,10 @@ class HttpClient
      */
     private array $rateLimits = [];
 
-    public function __construct(Logger $logger)
+    public function __construct(Logger $logger, FactoryInterface $factory)
     {
         $this->logger = $logger;
+        $this->factory = $factory;
     }
 
     public function getLastResponseErrorBody(): string
@@ -105,7 +108,7 @@ class HttpClient
         $this->lastResponseErrorCode = 0;
         $this->lastResponseErrorBody = '';
 
-        $request = ObjectProvider::createHttpRequest($method, $url, $headers, $body);
+        $request = $this->factory->createHttpRequest($method, $url, $headers, $body);
         try {
             $this->lastResponse = $this->getClient()->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
@@ -163,7 +166,7 @@ class HttpClient
     private function getClient(): ClientInterface
     {
         if ($this->client === null) {
-            $this->client = ObjectProvider::getHttpClient(
+            $this->client = $this->factory->createHttpClient(
                 'Neucore Discord Plugin (https://github.com/tkhamez/'.Service::PLUGIN_NAME.')'
             );
         }

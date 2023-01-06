@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use Neucore\Plugin\ObjectProvider;
+use Neucore\Plugin\Core\FactoryInterface;
 
 class Config
 {
@@ -49,16 +49,19 @@ class Config
 
     private Logger $logger;
 
-    public function __construct(Logger $logger, string $configurationData)
+    private FactoryInterface $factory;
+
+    public function __construct(Logger $logger, string $configurationData, FactoryInterface $factory)
     {
         $this->logger = $logger;
+        $this->factory = $factory;
 
         $this->parse($configurationData);
     }
 
     public function parse(string $configurationData): void
     {
-        $config = ObjectProvider::getSymfonyYamlParser()->parse($configurationData);
+        $config = $this->factory->createSymfonyYamlParser()->parse($configurationData);
 
         // required
         $this->tableName = (string)preg_replace(

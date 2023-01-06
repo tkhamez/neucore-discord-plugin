@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use Neucore\Plugin\CoreCharacter;
+use Neucore\Plugin\Core\FactoryInterface;
+use Neucore\Plugin\Data\CoreCharacter;
 use stdClass;
 
 class DiscordServer
@@ -21,10 +22,10 @@ class DiscordServer
 
     private string $baseUrl = 'https://discord.com/api';
 
-    public function __construct(Logger $logger, Config $config)
+    public function __construct(Logger $logger, Config $config, FactoryInterface $factory)
     {
         $this->config = $config;
-        $this->httpClient = new HttpClient($logger);
+        $this->httpClient = new HttpClient($logger, $factory);
     }
 
     public function getLastRequestError(): ?int

@@ -1,6 +1,6 @@
 
 ###
-### Required configuration
+### Required configuration for all plugins
 ###
 
 # A name for the plugin
@@ -17,6 +17,11 @@ psr4Prefix: Neucore\Plugin\Discord
 
 # Relative (to this file) path to the directory containing the classes of the above namespace.
 psr4Path: src
+
+
+###
+### Required configuration for service plugins
+###
 
 # Defines if this service allows only one account per player instead of one per character.
 oneAccount: true
@@ -36,7 +41,30 @@ actions:
 
 
 ###
-### Optional configuration
+### Optional configuration for all plugins
+###
+
+# Additional configuration for the plugin (supports multiline text). This is provided as the value of
+# the PluginConfiguration::$configurationData property.
+configurationData: |
+  TableName: database_table_name # Only allows the following chars: a-zA-Z0-9_
+  ServerId: 123 # Discord server ID
+  BotToken: abc # Discord application's bot token
+  OAuthRedirectUri: http://your.neucore.tld/plugin/{id}/callback
+  OAuthClientId: 456
+  OAuthClientSecret: def
+  Roles: # The Neucore player account needs one of these groups to get the Discord role
+    987: [1] # Discord role ID: Neucore group ID
+  Channels:
+    654: [9] # Discord channel ID: Neucore group ID
+  Nickname: '{characterName} [{corporationTicker}]'
+  NoNicknameChange: [654, 456] # Discord role IDs
+  DoNotKick: [543] # These members will never be kicked: Discord user ID
+  DisableKicks: false
+
+
+###
+### Optional configuration for service plugins
 ###
 
 # List of link buttons. Placeholders for URL: {plugin_id}, {username}, {password}, {email}
@@ -68,20 +96,3 @@ textRegister: Click "Register" to initialize your account.
 
 # Text below an account with status "pending" (supports multiline text).
 textPending:
-
-# Additional configuration for the plugin (supports multiline text).
-configurationData: |
-  TableName: database_table_name # Only allows the following chars: a-zA-Z0-9_
-  ServerId: 123 # Discord server ID
-  BotToken: abc # Discord application's bot token
-  OAuthRedirectUri: http://your.neucore.tld/plugin/{id}/callback
-  OAuthClientId: 456
-  OAuthClientSecret: def
-  Roles: # The Neucore player account needs one of these groups to get the Discord role
-    987: [1] # Discord role ID: Neucore group ID
-  Channels:
-    654: [9] # Discord channel ID: Neucore group ID
-  Nickname: '{characterName} [{corporationTicker}]'
-  NoNicknameChange: [654, 456] # Discord role IDs
-  DoNotKick: [543] # These members will never be kicked: Discord user ID
-  DisableKicks: false

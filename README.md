@@ -111,6 +111,10 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
+Version 3.2.0, 2023-01-06
+
+- Updated to plugin version 0.10.0.
+
 Version 3.1.0, 2022-12-28
 
 - Added plugin.yml file (this adds compatibility with Neucore version >= 1.41.0) and updated documentation. 

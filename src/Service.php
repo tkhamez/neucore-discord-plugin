@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Neucore\Plugin\Discord;
 
-use Neucore\Plugin\CoreCharacter;
-use Neucore\Plugin\CoreGroup;
+use Neucore\Plugin\Core\FactoryInterface;
+use Neucore\Plugin\Data\CoreAccount;
+use Neucore\Plugin\Data\CoreCharacter;
+use Neucore\Plugin\Data\CoreGroup;
+use Neucore\Plugin\Data\PluginConfiguration;
+use Neucore\Plugin\Data\ServiceAccountData;
 use Neucore\Plugin\Exception;
-use Neucore\Plugin\ServiceAccountData;
-use Neucore\Plugin\ServiceConfiguration;
 use Neucore\Plugin\ServiceInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,13 +25,15 @@ class Service implements ServiceInterface
 
     private Logger $logger;
 
-    private ServiceConfiguration $configuration;
+    private PluginConfiguration $configuration;
+
+    private FactoryInterface $factory;
 
     private string $sessionStateKey;
 
     private Config $config;
 
-    private CoreAccount $coreAccount;
+    private Account $account;
 
     private DiscordServer $discordServer;
 
@@ -54,15 +58,58 @@ class Service implements ServiceInterface
      */
     private array $channels = [];
 
-    public function __construct(LoggerInterface $logger, ServiceConfiguration $serviceConfiguration)
-    {
-        $this->logger = new Logger($logger, $serviceConfiguration->id);
-        $this->configuration = $serviceConfiguration;
+    public function __construct(
+        LoggerInterface $logger,
+        PluginConfiguration $pluginConfiguration,
+        FactoryInterface $factory,
+    ) {
+        $this->logger = new Logger($logger, $pluginConfiguration->id);
+        $this->configuration = $pluginConfiguration;
+        $this->factory = $factory;
 
         $this->sessionStateKey = "__plugin_{$this->configuration->id}_state";
-        $this->config = new Config($this->logger, $this->configuration->configurationData);
-        $this->coreAccount = new CoreAccount($this->logger, $this->config);
-        $this->discordServer = new DiscordServer($this->logger, $this->config);
+        $this->config = new Config($this->logger, $this->configuration->configurationData, $this->factory);
+        $this->account = new Account($this->logger, $this->config);
+        $this->discordServer = new DiscordServer($this->logger, $this->config, $this->factory);
+    }
+
+    public function onConfigurationChange(): void
+    {
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function request(
+        string $name,
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        ?CoreAccount $coreAccount,
+    ): ResponseInterface {
+        if (!$coreAccount) {
+            $response->getBody()->write('Error: Not logged in.');
+            return $response->withStatus(403);
+        }
+
+        if ($name === 'login') {
+            return $this->requestLogin($response);
+
+        } elseif ($name === 'callback') {
+            $response = $this->requestCallback($coreAccount->main, $request, $response);
+            try {
+                $this->updatePlayerAccount($coreAccount->main, $coreAccount->memberGroups);
+            } catch (Exception $e) {
+                // Ignore errors from the update here, just log.
+                $this->logger->log(
+                    'Request callback: Error from updatePlayerAccount() for Core player ' .
+                    $coreAccount->main->playerId . ': ' . $e->getMessage()
+                );
+            }
+            return $response;
+        }
+
+        $response->getBody()->write('404 Not Found.');
+        return $response->withStatus(404);
     }
 
     /**
@@ -78,7 +125,7 @@ class Service implements ServiceInterface
             return $character->id;
         }, $characters);
 
-        $account = $this->coreAccount->fetchPlayerAccount($characterIds, $characters[0]->playerId);
+        $account = $this->account->fetchPlayerAccount($characterIds, $characters[0]->playerId);
 
         return $account ? [$account] : [];
     }
@@ -94,7 +141,7 @@ class Service implements ServiceInterface
     ): ServiceAccountData {
         // actual account registration will be done in via request()
 
-        $this->coreAccount->createAccount(
+        $this->account->createAccount(
             $character->id,
             $character->playerId,
             ServiceAccountData::STATUS_NONMEMBER,
@@ -124,7 +171,7 @@ class Service implements ServiceInterface
         }, $groups);
 
         // Get member data of player from service account
-        $resultAccount = $this->coreAccount->getMemberData($mainCharacter->playerId);
+        $resultAccount = $this->account->getMemberData($mainCharacter->playerId);
         $characterId = (int)$resultAccount['characterId'];
         $discordUserId = (int)$resultAccount['discordId'];
         $additionalLogInfo = '';
@@ -146,7 +193,7 @@ class Service implements ServiceInterface
                 throw new Exception("Failed to kick$additionalLogInfo.");
             }
             $this->logger->log("Kicked $discordUserId (no main).");
-            $this->coreAccount->deleteAccount($mainCharacter->playerId);
+            $this->account->deleteAccount($mainCharacter->playerId);
             return;
         }
 
@@ -154,7 +201,7 @@ class Service implements ServiceInterface
         $memberObject = $this->discordMembers[$discordUserId] ?? $this->discordServer->getMemberData($discordUserId);
         if (!is_object($memberObject)) {
             if ($this->discordServer->getLastRequestError() === DiscordServer::ERROR_UNKNOWN_MEMBER) {
-                $this->coreAccount->updateAccountStatus(
+                $this->account->updateAccountStatus(
                     $mainCharacter->playerId,
                     null,
                     ServiceAccountData::STATUS_NONMEMBER
@@ -170,7 +217,11 @@ class Service implements ServiceInterface
         $memberUsername = $memberObject->user->username ?? '';
         $memberDiscriminator = (string)$memberObject->user->discriminator ?? '';
         if (!empty($memberUsername) && !empty($memberDiscriminator)) {
-            $this->coreAccount->updateMemberData($memberUsername, $memberDiscriminator, $mainCharacter->playerId);
+            $this->account->updateMemberData(
+                $memberUsername,
+                $memberDiscriminator,
+                $mainCharacter->playerId
+            );
         }
 
         // Check required groups and kick if needed.
@@ -185,7 +236,7 @@ class Service implements ServiceInterface
                 throw new Exception("Failed to kick$additionalLogInfo.");
             }
             $this->logger->log("Kicked $discordUserId (missing required group).");
-            $this->coreAccount->updateAccountStatus(
+            $this->account->updateAccountStatus(
                 $mainCharacter->playerId,
                 null,
                 ServiceAccountData::STATUS_NONMEMBER
@@ -215,16 +266,16 @@ class Service implements ServiceInterface
 
         if ($mainCharacter->id === 0) {
             // Remove service account from empty Core account.
-            $this->coreAccount->deleteAccount($mainCharacter->playerId);
+            $this->account->deleteAccount($mainCharacter->playerId);
         } elseif ($characterId !== $mainCharacter->id) {
             // Update character ID of service account if main changed.
-            $this->coreAccount->updateCharacterId($mainCharacter);
+            $this->account->updateCharacterId($mainCharacter);
         }
     }
 
     public function moveServiceAccount(int $toPlayerId, int $fromPlayerId): bool
     {
-        return $this->coreAccount->moveAccount($fromPlayerId, $toPlayerId);
+        return $this->account->moveAccount($fromPlayerId, $toPlayerId);
     }
 
     public function resetPassword(int $characterId): string
@@ -249,11 +300,11 @@ class Service implements ServiceInterface
         // Set service accounts active that exist in the local database from current server members
         // (that were added otherwise to the server)
         foreach (array_chunk($discordUserIds, 500) as $chunks) {
-            $this->coreAccount->updateAccountStatus(null, $chunks, ServiceAccountData::STATUS_ACTIVE);
+            $this->account->updateAccountStatus(null, $chunks, ServiceAccountData::STATUS_ACTIVE);
         }
 
         // Get all Discord member IDs that do not exist in the local database.
-        $localDiscordIds = $this->coreAccount->getDiscordIds($discordUserIds);
+        $localDiscordIds = $this->account->getDiscordIds($discordUserIds);
         $missingDiscordIds = array_diff($discordUserIds, $localDiscordIds);
 
         if (!$this->config->disableKicks) {
@@ -280,40 +331,14 @@ class Service implements ServiceInterface
         }
 
         // Fetch all accounts and return them
-        return $this->coreAccount->fetchAllAccounts();
+        return $this->account->fetchAllAccounts();
     }
 
-    /**
-     * @throws Exception
-     */
-    public function request(
-        CoreCharacter $coreCharacter,
-        string $name,
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        array $groups
-    ): ResponseInterface {
-        if ($name === 'login') {
-            return $this->requestLogin($response);
-        } elseif ($name === 'callback') {
-            $response = $this->requestCallback($coreCharacter, $request, $response);
-            try {
-                $this->updatePlayerAccount($coreCharacter, $groups);
-            } catch (Exception $e) {
-                // Ignore errors from the update here, just log.
-                $this->logger->log(
-                    "Request callback: Error from updatePlayerAccount() for Core player $coreCharacter->playerId: " .
-                    $e->getMessage()
-                );
-            }
-            return $response;
-        }
-        $response->getBody()->write('404 Not Found.');
-        return $response->withStatus(404);
-    }
-
-    public function onConfigurationChange(): void
+    public function search(string $query): array
     {
+        return array_map(function (int $characterId) {
+            return new ServiceAccountData($characterId);
+        }, $this->account->find($query));
     }
 
     /**
@@ -486,7 +511,7 @@ class Service implements ServiceInterface
         $discriminator = $info['discriminator'];
 
         // Delete service account for this Discord user from any other Neucore account, should it exist
-        if (!$this->coreAccount->deleteOtherAccounts($userId, $coreCharacter->playerId)) {
+        if (!$this->account->deleteOtherAccounts($userId, $coreCharacter->playerId)) {
             return $this->buildCallbackResponse(
                 $response,
                 'Failed: Could not delete this Discord user from other Neucore accounts.'
@@ -494,13 +519,13 @@ class Service implements ServiceInterface
         }
 
         // Check if account exists
-        $exists = $this->coreAccount->accountExists($coreCharacter->playerId);
+        $exists = $this->account->accountExists($coreCharacter->playerId);
         if ($exists === null) {
             return $this->buildCallbackResponse($response, 'Failed: Could not fetch local service account.');
         }
         if ($exists === false) {
             try {
-                $this->coreAccount->createAccount(
+                $this->account->createAccount(
                     $coreCharacter->id,
                     $coreCharacter->playerId,
                     ServiceAccountData::STATUS_ACTIVE,
@@ -513,7 +538,7 @@ class Service implements ServiceInterface
         }
 
         // Update record (also update character id because main could have changed).
-        if (!$this->coreAccount->updateAccount($coreCharacter, $userId, $username, $discriminator)) {
+        if (!$this->account->updateAccount($coreCharacter, $userId, $username, $discriminator)) {
             return $this->buildCallbackResponse($response, 'Failed: Could not update local service account');
         }
 
