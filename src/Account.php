@@ -372,10 +372,13 @@ class Account
         $stmt = $this->getPDO()->prepare(
             "SELECT character_id 
             FROM {$this->config->tableName} 
-            WHERE discord_id LIKE ? or username LIKE ? or discriminator LIKE ?"
+            WHERE discord_id LIKE ? OR 
+                  username LIKE ? OR 
+                  discriminator LIKE ? OR 
+                  CONCAT(username, '#', discriminator) LIKE ?"
         );
         try {
-            $stmt->execute(["%$query%", "%$query%", "%$query%"]);
+            $stmt->execute(["%$query%", "%$query%", "%$query%", "%$query%"]);
         } catch (PDOException $e) {
             $this->logger->logException($e, __FUNCTION__);
             throw new Exception();
