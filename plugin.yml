@@ -9,7 +9,7 @@ name: Discord auth
 # Type of the plugin. The only possible value for now is "service".
 type: service
 
-# Full class name of class implementing Neucore\Plugin\ServiceInterface.
+# Full class name of class implementing Neucore\Plugin\ServiceInterface or Neucore\Plugin\GeneralInterface.
 phpClass: Neucore\Plugin\Discord\Service
 
 # PHP namespace that should be loaded by the PSR-4 autoloader.
