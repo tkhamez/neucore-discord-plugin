@@ -97,7 +97,7 @@ class Service implements ServiceInterface
         } elseif ($name === 'callback') {
             $response = $this->requestCallback($coreAccount->main, $request, $response);
             try {
-                $this->updatePlayerAccount($coreAccount->main, $coreAccount->memberGroups);
+                $this->updatePlayerAccount($coreAccount->main, $coreAccount->getMemberGroups());
             } catch (Exception $e) {
                 // Ignore errors from the update here, just log.
                 $this->logger->log(

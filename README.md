@@ -111,6 +111,10 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 ## Changelog:
 
+Next
+
+- Groups used when inviting to a server now respect the "group deactivation" feature. (needs Neucore > 1.42.0)
+
 Version 3.2.0, 2023-01-06
 
 - Updated to plugin version 0.10.0.
