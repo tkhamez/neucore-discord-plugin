@@ -74,6 +74,11 @@ Notes:
   NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username
   NEUCORE_DISCORD_PLUGIN_DB_PASSWORD=password
   ```
+- Optional environment variables:
+  ```
+  NEUCORE_DISCORD_PLUGIN_DB_SSL_CA="/path/to/ca-cert.pem"
+  NEUCORE_DISCORD_PLUGIN_DB_SSL_VERIFY=1
+  ```
 - Add a new Neucore service.  
   The ID of it (found in the URL when the plugin configuration is shown) is needed for the 
   redirect URL for the Discord app and for the `OAuthRedirectUri` value in the "Configuration Data" (see below).

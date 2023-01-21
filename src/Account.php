@@ -431,11 +431,20 @@ class Account
     private function getPDO(): PDO
     {
         if ($this->pdo === null) {
+            $options = [];
+            if (isset($_ENV['NEUCORE_DISCORD_PLUGIN_DB_SSL_CA'])) {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $_ENV['NEUCORE_DISCORD_PLUGIN_DB_SSL_CA'];
+            }
+            if (isset($_ENV['NEUCORE_DISCORD_PLUGIN_DB_SSL_VERIFY'])) {
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] =
+                    $_ENV['NEUCORE_DISCORD_PLUGIN_DB_SSL_VERIFY'] === '1';
+            }
             try {
                 $this->pdo = new PDO(
                     $_ENV['NEUCORE_DISCORD_PLUGIN_DB_DSN'],
                     $_ENV['NEUCORE_DISCORD_PLUGIN_DB_USERNAME'],
-                    $_ENV['NEUCORE_DISCORD_PLUGIN_DB_PASSWORD']
+                    $_ENV['NEUCORE_DISCORD_PLUGIN_DB_PASSWORD'],
+                    $options
                 );
             } catch (PDOException $e) {
                 $this->logger->logException($e, __FUNCTION__);

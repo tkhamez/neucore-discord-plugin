@@ -5,6 +5,7 @@
 - The table from the configuration is now automatically created when the plugin configuration is saved.
 - Groups used when inviting to a server now respect the "group deactivation" feature. (Update to plugin
   version 0.11.0, needs Neucore > 1.42.0)
+- Added support for encrypted database connection.
 
 ## Version 3.2.0, 2023-01-06
 
