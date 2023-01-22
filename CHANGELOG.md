@@ -1,6 +1,6 @@
 # Changelog:
 
-## next
+## Version 3.3.0, 2023-01-22
 
 - The table from the configuration is now automatically created when the plugin configuration is saved.
 - Groups used when inviting to a server now respect the "group deactivation" feature. (Update to plugin
