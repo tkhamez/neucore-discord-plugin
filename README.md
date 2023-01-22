@@ -67,21 +67,20 @@ Notes:
 
 ## Install
 
-- Create the database table from `db-schema.sql`. For each additional service configuration in Neucore for this
-  plugin add another table (change the name).
-  The plugin needs the following environment variables on the Neucore server:
+- The plugin needs the following environment variables on the Neucore server:
   ```
   NEUCORE_DISCORD_PLUGIN_DB_DSN=mysql:dbname=neucore_discord;host=127.0.0.1
   NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username
   NEUCORE_DISCORD_PLUGIN_DB_PASSWORD=password
   ```
-- Add a new Neucore service.   
-  The ID of it (found in the URL when the plugin is loaded) is needed for the 
+- Add a new Neucore service.  
+  The ID of it (found in the URL when the plugin configuration is shown) is needed for the 
   redirect URL for the Discord app and for the `OAuthRedirectUri` value in the "Configuration Data" (see below).
 - Choose the "Discord auth" plugin from the configuration.
 - Adjust all values in the "Configuration Data" field at the bottom. The format is [YAML](https://yaml.org/).
   - The following are required:
-    - TableName
+    - TableName - Allowed character: `a-z A-Z 0-9 _` (no spaces). The table is created automatically when the plugin 
+      configuration is saved.
     - ServerId
     - BotToken
     - OAuthRedirectUri (also replace `{id}` in the URL with the service ID)
@@ -113,6 +112,7 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
 Next
 
+- The table from the configuration is now automatically created when the plugin configuration is saved.
 - Groups used when inviting to a server now respect the "group deactivation" feature. (needs Neucore > 1.42.0)
 
 Version 3.2.0, 2023-01-06

@@ -8,6 +8,8 @@ use Neucore\Plugin\Core\FactoryInterface;
 
 class Config
 {
+    public const MISSING_TABLE_NAME = '__missing_table_name__';
+
     public string $tableName = '';
 
     public int $serverId = 0;
@@ -66,7 +68,7 @@ class Config
         // required
         $this->tableName = (string)preg_replace(
             '/[^a-zA-Z0-9_]/', '',
-            $config['TableName'] ?? '__missing_table_name__'
+            $config['TableName'] ?? self::MISSING_TABLE_NAME
         );
         $this->serverId = (int)($config['ServerId'] ?? 0);
         $botToken = (string)($config['BotToken'] ?? '');

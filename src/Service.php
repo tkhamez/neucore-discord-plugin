@@ -75,6 +75,7 @@ class Service implements ServiceInterface
 
     public function onConfigurationChange(): void
     {
+        $this->account->createTable();
     }
 
     /**

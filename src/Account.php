@@ -390,6 +390,43 @@ class Account
 
     /**
      * @throws Exception
+     * @noinspection SqlResolve
+     */
+    public function createTable(): void
+    {
+        $name = $this->config->tableName;
+        if (empty($name) || $name === Config::MISSING_TABLE_NAME) {
+            return;
+        }
+
+        foreach ($this->getPDO()->query('SHOW TABLES')->fetchAll(PDO::FETCH_NUM) as $record) {
+            if ($record[0] === $name) {
+                return;
+            }
+        }
+
+        $this->getPDO()->exec("
+            create table $name
+            (
+                character_id  int          not null,
+                player_id     int          not null,
+                discord_id    bigint       null,
+                member_status varchar(32)  not null,
+                username      varchar(255) null,
+                discriminator varchar(8)   null,
+                created       datetime     null,
+                updated       datetime     null,
+                constraint {$name}_character_id_uindex unique (character_id),
+                constraint {$name}_discord_id_uindex unique (discord_id),
+                constraint {$name}_player_id_uindex unique (player_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ");
+        $this->getPDO()->exec("create index {$name}_status_index on $name (member_status)");
+        $this->getPDO()->exec("create index {$name}_updated_index on $name (updated)");
+    }
+
+    /**
+     * @throws Exception
      */
     private function getPDO(): PDO
     {
