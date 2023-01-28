@@ -1,5 +1,10 @@
 # Changelog:
 
+## next
+
+- NEUCORE_DISCORD_PLUGIN_DB_USERNAME and NEUCORE_DISCORD_PLUGIN_DB_PASSWORD are now optional: user and password
+  can be added to NEUCORE_DISCORD_PLUGIN_DB_DSN.
+
 ## Version 3.3.0, 2023-01-22
 
 - The table from the configuration is now automatically created when the plugin configuration is saved.

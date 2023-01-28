@@ -70,9 +70,9 @@ Notes:
 
 - The plugin needs the following environment variables on the Neucore server:
   ```
-  NEUCORE_DISCORD_PLUGIN_DB_DSN=mysql:dbname=neucore_discord;host=127.0.0.1
-  NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username
-  NEUCORE_DISCORD_PLUGIN_DB_PASSWORD=password
+  NEUCORE_DISCORD_PLUGIN_DB_DSN=mysql:dbname=neucore_discord;host=127.0.0.1;user=discord;password=pass
+  NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username # Only required if DSN does not include user
+  NEUCORE_DISCORD_PLUGIN_DB_PASSWORD=password # Only required if DSN does not include password
   ```
 - Optional environment variables:
   ```

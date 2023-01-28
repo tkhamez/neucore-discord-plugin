@@ -442,8 +442,8 @@ class Account
             try {
                 $this->pdo = new PDO(
                     $_ENV['NEUCORE_DISCORD_PLUGIN_DB_DSN'],
-                    $_ENV['NEUCORE_DISCORD_PLUGIN_DB_USERNAME'],
-                    $_ENV['NEUCORE_DISCORD_PLUGIN_DB_PASSWORD'],
+                    $_ENV['NEUCORE_DISCORD_PLUGIN_DB_USERNAME'] ?? null,
+                    $_ENV['NEUCORE_DISCORD_PLUGIN_DB_PASSWORD'] ?? null,
                     $options
                 );
             } catch (PDOException $e) {
