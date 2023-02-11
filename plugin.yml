@@ -32,7 +32,7 @@ properties:
   - status
 
 # If this is not enabled and the account contains a password (see properties), the user will be able to see
-# it only once after it is reset (see actions).
+# it only once directly after it was reset (see actions).
 showPassword: false
 
 # List of actions, possible values: update-account, reset-password
