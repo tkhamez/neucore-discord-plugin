@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c49ae8406e0c8936595079b949cd7de4",
+    "content-hash": "ec9eceb05ed09be6e46a1aeb3efee51b",
     "packages": [
         {
             "name": "psr/http-client",
@@ -387,16 +387,16 @@
         },
         {
             "name": "tkhamez/neucore-plugin",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tkhamez/neucore-plugin.git",
-                "reference": "e222f3f8f8ab1c46b9f6374570bf563bab970956"
+                "reference": "ecee696864a9ed78dbb15687f9498c8878f48cbd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tkhamez/neucore-plugin/zipball/e222f3f8f8ab1c46b9f6374570bf563bab970956",
-                "reference": "e222f3f8f8ab1c46b9f6374570bf563bab970956",
+                "url": "https://api.github.com/repos/tkhamez/neucore-plugin/zipball/ecee696864a9ed78dbb15687f9498c8878f48cbd",
+                "reference": "ecee696864a9ed78dbb15687f9498c8878f48cbd",
                 "shasum": ""
             },
             "require": {
@@ -424,9 +424,9 @@
             "description": "Necessary classes to write a Neucore plugin.",
             "support": {
                 "issues": "https://github.com/tkhamez/neucore-plugin/issues",
-                "source": "https://github.com/tkhamez/neucore-plugin/tree/1.0.0"
+                "source": "https://github.com/tkhamez/neucore-plugin/tree/2.0.0"
             },
-            "time": "2023-02-11T20:00:18+00:00"
+            "time": "2023-02-18T20:49:41+00:00"
         }
     ],
     "packages-dev": [

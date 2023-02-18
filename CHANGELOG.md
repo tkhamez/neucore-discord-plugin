@@ -1,5 +1,9 @@
 # Changelog:
 
+## next
+
+- Update to neucore-plugin 2.0.0
+
 ## 3.4.0, 2023-02-11
 
 - NEUCORE_DISCORD_PLUGIN_DB_USERNAME and NEUCORE_DISCORD_PLUGIN_DB_PASSWORD are now optional: user and password

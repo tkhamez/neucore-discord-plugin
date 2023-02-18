@@ -87,7 +87,7 @@ class Service implements ServiceInterface
         ResponseInterface $response,
         ?CoreAccount $coreAccount,
     ): ResponseInterface {
-        if (!$coreAccount) {
+        if (!$coreAccount || !$coreAccount->main || !is_array($coreAccount->getMemberGroups())) {
             $response->getBody()->write('Error: Not logged in.');
             return $response->withStatus(403);
         }
