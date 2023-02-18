@@ -1,6 +1,6 @@
 # Changelog:
 
-## next
+## 3.5.0, 2023-02-18
 
 - Update to neucore-plugin 2.0.0
 
