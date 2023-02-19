@@ -1,9 +1,10 @@
 # Neucore Discord Plugin
 
+_Needs [Neucore](https://github.com/tkhamez/neucore) version 1.45.0 or higher._
+
 A Discord bot that can add and remove members from a server, manage member roles, channel membership and set nicknames.
 
-This is a service [plugin](https://github.com/tkhamez/neucore-plugin) for 
-[Neucore](https://github.com/tkhamez/neucore). It can also be used as a 
+This is a [service plugin](https://github.com/tkhamez/neucore-plugin) for Neucore. It can also be used as a 
 library in other projects: `composer require tkhamez/neucore-discord-plugin`.
 
 Features in detail:

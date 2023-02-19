@@ -2,7 +2,7 @@
 
 ## 3.5.0, 2023-02-18
 
-- Update to neucore-plugin 2.0.0
+- Needs Neucore version 1.45.0 or higher now / Updated to neucore-plugin 2.0.
 
 ## 3.4.0, 2023-02-11
 
