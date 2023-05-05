@@ -70,16 +70,13 @@ Notes:
 ## Install
 
 - The plugin needs the following environment variables on the Neucore server:
-  ```
-  NEUCORE_DISCORD_PLUGIN_DB_DSN=mysql:dbname=neucore_discord;host=127.0.0.1;user=discord;password=pass
-  NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username # Only required if DSN does not include user
-  NEUCORE_DISCORD_PLUGIN_DB_PASSWORD=password # Only required if DSN does not include password
-  ```
+  - `NEUCORE_DISCORD_PLUGIN_DB_DSN=mysql:dbname=neucore_discord;host=127.0.0.1;user=discord;password=pass`
+  - `NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username` Only required if DSN above does not include "user".
+  - `NEUCORE_DISCORD_PLUGIN_DB_PASSWORD=password` Only required if DSN above does not include "password".
 - Optional environment variables:
-  ```
-  NEUCORE_DISCORD_PLUGIN_DB_SSL_CA="/path/to/ca-cert.pem"
-  NEUCORE_DISCORD_PLUGIN_DB_SSL_VERIFY=1
-  ```
+  - `NEUCORE_DISCORD_PLUGIN_DB_SSL_CA="/path/to/ca-cert.pem"`  
+    This enables encryption for the connection, even if it is set to an empty value.
+  - `NEUCORE_DISCORD_PLUGIN_DB_SSL_VERIFY=1`
 - Add a new Neucore service.  
   The ID of it (found in the URL when the plugin configuration is shown) is needed for the 
   redirect URL for the Discord app and for the `OAuthRedirectUri` value in the "Configuration Data" (see below).
