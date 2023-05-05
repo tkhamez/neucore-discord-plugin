@@ -235,7 +235,7 @@ class DiscordServer
         $userId = $info['user']['id'] ?? null;
         $username = $info['user']['username'] ?? null;
         $discriminator = $info['user']['discriminator'] ?? null;
-        if (!$userId || !$username || !$discriminator) {
+        if (!$userId) {
             return null;
         } else {
             return [

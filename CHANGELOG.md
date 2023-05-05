@@ -1,5 +1,9 @@
 # Changelog:
 
+## 3.5.1, 2023-05-05
+
+- Discriminator can be empty now (see also https://support.discord.com/hc/en-us/articles/12620128861463).
+
 ## 3.5.0, 2023-02-18
 
 - Needs Neucore version 1.45.0 or higher now / Updated to neucore-plugin 2.0.

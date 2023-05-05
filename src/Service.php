@@ -215,9 +215,9 @@ class Service implements ServiceInterface
         }
 
         // Update status (to active), username and discriminator.
-        $memberUsername = $memberObject->user->username ?? '';
-        $memberDiscriminator = (string)$memberObject->user->discriminator ?? '';
-        if (!empty($memberUsername) && !empty($memberDiscriminator)) {
+        $memberUsername = (string)($memberObject->user->username ?? '');
+        $memberDiscriminator = (string)($memberObject->user->discriminator ?? '');
+        if (!empty($memberUsername)) {
             $this->account->updateMemberData(
                 $memberUsername,
                 $memberDiscriminator,
@@ -508,8 +508,8 @@ class Service implements ServiceInterface
             return $this->buildCallbackResponse($response, 'Failed: Could not retrieve Discord user id.');
         }
         $userId = (int)$info['userId'];
-        $username = $info['username'];
-        $discriminator = $info['discriminator'];
+        $username = (string)$info['username'];
+        $discriminator = (string)$info['discriminator'];
 
         // Delete service account for this Discord user from any other Neucore account, should it exist
         if (!$this->account->deleteOtherAccounts($userId, $coreCharacter->playerId)) {
