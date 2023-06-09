@@ -69,6 +69,9 @@ Notes:
 
 ## Install
 
+- Follow the plugin installation instructions here:
+  [Neucore Plugins.md](https://github.com/tkhamez/neucore/blob/main/doc/Plugins.md#install-a-plugin).
+- Create a new database for the plugin (e.g. neucore_discord). The plugin will create the tables automatically.
 - The plugin needs the following environment variables on the Neucore server:
   - `NEUCORE_DISCORD_PLUGIN_DB_DSN=mysql:dbname=neucore_discord;host=127.0.0.1;user=discord;password=pass`
   - `NEUCORE_DISCORD_PLUGIN_DB_USERNAME=username` Only required if DSN above does not include "user".
@@ -100,6 +103,9 @@ Notes:
 - Optionally add required groups.
 - Optionally adjust any texts.
 - Activate the plugin when done.
+
+This plugin uses the Neucore command "update-service-accounts" to update Discord roles etc., so make sure that
+the [Neucore cronjob](https://github.com/tkhamez/neucore/blob/main/doc/Install.md#cronjob) is running.
 
 ## Development:
 
