@@ -3,11 +3,11 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "php": "^8.0",
+        "php": "^8.0.2",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-pdo": "*",
-        "tkhamez/neucore-plugin": "^2.0"
+        "tkhamez/neucore-plugin": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"
@@ -20,7 +20,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.0.0"
+            "php": "8.0.2"
         }
     }
 }

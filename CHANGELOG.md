@@ -1,5 +1,12 @@
 # Changelog:
 
+## 4.0.0, YYYY-MM-DD
+
+This version needs Neucore version 2.2.0 or higher.
+
+- Raised minimum required PHP version to 8.0.2, from 8.0.0.
+- Updated to Neucore plugin version 3.
+
 ## 3.5.1, 2023-05-05
 
 - Discriminator can be empty now (see also https://support.discord.com/hc/en-us/articles/12620128861463).
