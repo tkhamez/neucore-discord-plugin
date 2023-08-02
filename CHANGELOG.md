@@ -7,6 +7,7 @@ This version needs Neucore version 2.2.0 or higher.
 - Raised minimum required PHP version to 8.0.2, from 8.0.0.
 - Updated to Neucore plugin version 3.
 - No longer showing discriminators with the value 0.
+- Fix: The account search now handles the backslash correctly and disallows wildcards.
 
 ## 3.5.1, 2023-05-05
 

@@ -372,6 +372,8 @@ class Account
      */
     public function find(string $query): array
     {
+        $query = str_replace(['\\', '_', '%'], ['\\\\', '\_', '\%'], $query);
+
         /** @noinspection SqlResolve */
         $stmt = $this->getPDO()->prepare(
             "SELECT character_id 
