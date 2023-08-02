@@ -47,10 +47,14 @@ class Account
         }
         $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (isset($accounts[0])) {
+            $discriminator = '';
+            if ($accounts[0]['username'] !== Service::USERNAME_NA && !empty($accounts[0]['discriminator'])) {
+                // Discriminator is removed and (temporarily?) set to 0. Some accounts may still have it.
+                $discriminator = "#{$accounts[0]['discriminator']}";
+            }
             return new ServiceAccountData(
                 (int)$accounts[0]['character_id'],
-                $accounts[0]['username'] .
-                    ($accounts[0]['username'] !== Service::USERNAME_NA ? '#' . $accounts[0]['discriminator'] : ''),
+                $accounts[0]['username'] . $discriminator,
                 null,
                 null,
                 $accounts[0]['member_status']
