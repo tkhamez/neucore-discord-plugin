@@ -1,6 +1,6 @@
 # Changelog:
 
-## 4.0.0, YYYY-MM-DD
+## 4.0.0, 2023-08-04
 
 This version needs Neucore version 2.2.0 or higher.
 
