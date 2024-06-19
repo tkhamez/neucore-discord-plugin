@@ -2,7 +2,8 @@
 
 _Needs [Neucore](https://github.com/tkhamez/neucore) version 2.2.0 or higher._
 
-A Discord bot that can add and remove members from a server, manage member roles, channel membership and set nicknames.
+A Discord bot for [EVE Online](https://www.eveonline.com/) that can add and remove members from a 
+server, manage member roles, channel membership and set nicknames.
 
 This is a [service plugin](https://github.com/tkhamez/neucore-plugin) for Neucore. It can also be used as a 
 library in other projects: `composer require tkhamez/neucore-discord-plugin`.
