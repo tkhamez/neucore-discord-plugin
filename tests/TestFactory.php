@@ -23,7 +23,7 @@ class TestFactory implements FactoryInterface
     public function createHttpRequest(
         string $method, string $url,
         array $headers = [],
-        string $body = null
+        ?string $body = null
     ): RequestInterface {
     }
 

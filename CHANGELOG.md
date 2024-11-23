@@ -1,5 +1,10 @@
 # Changelog:
 
+## 5.0.0, 2023-11-23
+
+- Raised minimum required PHP version to 8.1.0
+- Compatibility with PHP 8.4.
+
 ## 4.0.0, 2023-08-04
 
 This version needs Neucore version 2.2.0 or higher.

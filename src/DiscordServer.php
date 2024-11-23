@@ -137,7 +137,7 @@ class DiscordServer
     /**
      * https://discord.com/developers/docs/resources/guild#modify-guild-member - MANAGE_NICKNAMES
      */
-    public function setNickname(int $userId, CoreCharacter $character, string $currentNickname = null): bool
+    public function setNickname(int $userId, CoreCharacter $character, ?string $currentNickname = null): bool
     {
         $this->lastRequestError = null;
 
