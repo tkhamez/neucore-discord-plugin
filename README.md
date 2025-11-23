@@ -111,6 +111,11 @@ the [Neucore cronjob](https://github.com/tkhamez/neucore/blob/main/doc/Install.m
 ## Development:
 
 ```shell
+docker build --tag neucore-plugin-discord .
+docker run -it --mount type=bind,source="$(pwd)",target=/app --workdir /app neucore-plugin-discord /bin/sh
+```
+
+```shell
 composer install
 ```
 
