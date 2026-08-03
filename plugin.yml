@@ -85,8 +85,8 @@ textAccount:
   After you have been successfully invited, you can deauthorize this app in your user settings if you wish.
 
 
-  Status Active: Click the "Update Account" button to sync your Core groups with Discord roles. This also 
-  happens automatically several times a day.'
+  Status Active: Click the "Update Account" button to sync your Core groups with Discord roles. 
+  This should also happen automatically on a regular basis.'
 
 # Text below the registration form/button (supports multiline text).
 textRegister: Click "Register" to initialize your account.
