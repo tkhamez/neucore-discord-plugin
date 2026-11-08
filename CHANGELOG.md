@@ -1,6 +1,6 @@
 # Changelog:
 
-## next
+## 5.2.0, 2026-11-08
 
 - The invitation now works with a session cookie with `SameSite=Strict`.
 
