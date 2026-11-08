@@ -1,6 +1,6 @@
 # Neucore Discord Plugin
 
-_Needs [Neucore](https://github.com/tkhamez/neucore) version 2.2.0 or higher._
+_Needs [Neucore](https://github.com/tkhamez/neucore) version 3.3.0 or higher._
 
 A Discord bot for [EVE Online](https://www.eveonline.com/) that can add and remove members from a 
 server, manage member roles, channel membership and set nicknames.
