@@ -41,6 +41,10 @@ actions:
 ### Optional configuration for all plugins
 ###
 
+# Request names for URLs that Neucore should redirect first before the request is passed to the plugin.
+# See the Neucore plugin documentation for more information.
+redirectRequestNames: [callback]
+
 # Additional configuration for the plugin (supports multiline text). This is provided as the value of
 # the PluginConfiguration::$configurationData property.
 configurationData: |

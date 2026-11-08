@@ -1,5 +1,9 @@
 # Changelog:
 
+## next
+
+- The invitation now works with a session cookie with `SameSite=Strict`.
+
 ## 5.1.0, 2026-01-05
 
 - Compatibility with PHP 8.5
